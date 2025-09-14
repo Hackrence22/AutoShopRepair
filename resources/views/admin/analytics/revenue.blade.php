@@ -59,6 +59,18 @@
         
         <div class="col-6 col-md-3">
             <div class="shadow-sm rounded-4 p-3 d-flex align-items-center gap-3 bg-white">
+                <div class="bg-secondary bg-gradient rounded-circle d-flex align-items-center justify-content-center" style="width:40px;height:40px;">
+                    <i class="fas fa-calendar-check text-white"></i>
+                </div>
+                <div>
+                    <div class="fw-bold fs-4 text-secondary">{{ $totalAppointments ?? 0 }}</div>
+                    <div class="text-secondary small">Completed Appointments</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <div class="shadow-sm rounded-4 p-3 d-flex align-items-center gap-3 bg-white">
                 <div class="bg-primary bg-gradient rounded-circle d-flex align-items-center justify-content-center" style="width:40px;height:40px;">
                     <i class="fas fa-chart-line text-white"></i>
                 </div>
@@ -69,6 +81,18 @@
             </div>
         </div>
         
+        <div class="col-6 col-md-3">
+            <div class="shadow-sm rounded-4 p-3 d-flex align-items-center gap-3 bg-white">
+                <div class="bg-dark bg-gradient rounded-circle d-flex align-items-center justify-content-center" style="width:40px;height:40px;">
+                    <i class="fas fa-briefcase text-white"></i>
+                </div>
+                <div>
+                    <div class="fw-bold fs-4 text-dark">{{ $totalServices ?? 0 }}</div>
+                    <div class="text-secondary small">Unique Services</div>
+                </div>
+            </div>
+        </div>
+
         <div class="col-6 col-md-3">
             <div class="shadow-sm rounded-4 p-3 d-flex align-items-center gap-3 bg-white">
                 <div class="bg-info bg-gradient rounded-circle d-flex align-items-center justify-content-center" style="width:40px;height:40px;">

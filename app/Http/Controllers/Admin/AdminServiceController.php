@@ -68,13 +68,20 @@ class AdminServiceController extends Controller
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
             'duration' => 'required|integer|min:1',
+            'duration_unit' => 'nullable|in:minutes,hours,days',
             'type' => 'required|in:repair,maintenance,inspection,other',
             'shop_id' => 'required|exists:shops,id',
             'is_active' => 'sometimes|boolean'
         ]);
 
         $validated['is_active'] = $request->boolean('is_active', false);
+        if ($request->input('duration_unit') === 'hours') {
+            $validated['duration'] = $validated['duration'] * 60;
+        } elseif ($request->input('duration_unit') === 'days') {
+            $validated['duration'] = $validated['duration'] * 1440; // minutes in a day
+        }
 
+        unset($validated['duration_unit']);
         Service::create($validated);
 
         return redirect()->route('admin.services.index')
@@ -111,13 +118,20 @@ class AdminServiceController extends Controller
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
             'duration' => 'required|integer|min:1',
+            'duration_unit' => 'nullable|in:minutes,hours,days',
             'type' => 'required|in:repair,maintenance,inspection,other',
             'shop_id' => 'required|exists:shops,id',
             'is_active' => 'sometimes|boolean'
         ]);
 
         $validated['is_active'] = $request->boolean('is_active', false);
+        if ($request->input('duration_unit') === 'hours') {
+            $validated['duration'] = $validated['duration'] * 60;
+        } elseif ($request->input('duration_unit') === 'days') {
+            $validated['duration'] = $validated['duration'] * 1440; // minutes in a day
+        }
 
+        unset($validated['duration_unit']);
         $service->update($validated);
 
         return redirect()->route('admin.services.index')

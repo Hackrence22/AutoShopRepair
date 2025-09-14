@@ -7,19 +7,19 @@
     <div class="row justify-content-center">
         <div class="col-md-12">
             <div class="card shadow-sm">
-                <div class="card-header bg-white d-flex flex-column flex-md-row justify-content-between align-items-md-center py-3" style="gap:0.75rem;">
-                    <h5 class="mb-0 text-primary">
+                <div class="card-header bg-primary text-white d-flex flex-column flex-md-row justify-content-between align-items-md-center py-3" style="gap:0.75rem;">
+                    <h5 class="mb-0 text-white">
                         <i class="fas fa-calendar-alt me-2"></i> Appointments
                     </h5>
                     <div class="d-flex align-items-center" style="gap:0.5rem;">
                         <form method="GET" action="{{ route('appointments.index') }}" class="d-flex" role="search">
                             <div class="input-group">
-                                <span class="input-group-text bg-white"><i class="fas fa-search"></i></span>
-                                <input type="text" class="form-control" name="q" value="{{ request('q') }}" placeholder="Search date (YYYY-MM-DD), service, shop, status...">
+                                <span class="input-group-text bg-white border-0"><i class="fas fa-search"></i></span>
+                                <input type="text" class="form-control border-0" name="q" value="{{ request('q') }}" placeholder="Search date (YYYY-MM-DD), service, shop, status...">
                             </div>
                         </form>
-                        <a href="{{ route('appointments.create') }}" class="btn btn-primary">
-                            <i class="fas fa-plus-circle me-2"></i>Book New Appointment
+                        <a href="{{ route('appointments.create') }}" class="btn btn-light text-primary">
+                            <i class="fas fa-plus-circle me-2"></i>New
                         </a>
                     </div>
                 </div>

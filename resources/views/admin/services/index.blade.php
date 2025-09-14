@@ -82,7 +82,19 @@
                                     </div>
                                     <div class="mb-2">
                                         <span class="fw-bold text-muted">Duration:</span> 
-                                        <span class="text-muted">{{ $service->duration }} minutes</span>
+                                        @php
+                                            $mins = (int) $service->duration;
+                                            $days = intdiv($mins, 1440);
+                                            $mins -= $days * 1440;
+                                            $hours = intdiv($mins, 60);
+                                            $mins -= $hours * 60;
+                                            $parts = [];
+                                            if ($days > 0) $parts[] = $days . 'd';
+                                            if ($hours > 0) $parts[] = $hours . 'h';
+                                            if ($mins > 0 || empty($parts)) $parts[] = $mins . 'm';
+                                            $humanDuration = implode(' ', $parts);
+                                        @endphp
+                                        <span class="text-muted">{{ $humanDuration }}</span>
                                     </div>
                                     <div class="mb-3">
                                         <span class="fw-bold text-muted">Description:</span>
@@ -90,7 +102,7 @@
                                     </div>
                                     <div class="d-flex gap-2 flex-wrap">
                                         <span class="badge bg-primary text-white"><i class="fas fa-store me-1"></i> {{ $shop->name }}</span>
-                                        <span class="badge bg-dark text-white"><i class="fas fa-clock me-1"></i> {{ $service->duration }}min</span>
+                                        <span class="badge bg-dark text-white"><i class="fas fa-clock me-1"></i> {{ $humanDuration }}</span>
                                     </div>
                                 </div>
                                 <div class="card-footer bg-white border-0 d-flex justify-content-between align-items-center pt-2 pb-3">
@@ -238,7 +250,19 @@ function showServiceDetails(serviceId, serviceName, description, type, price, du
     document.getElementById('modal-service-description').textContent = description;
     document.getElementById('modal-service-type').innerHTML = `<span class="badge bg-info">${type.charAt(0).toUpperCase() + type.slice(1)}</span>`;
     document.getElementById('modal-service-price').textContent = `₱${price}`;
-    document.getElementById('modal-service-duration').textContent = `${duration} minutes`;
+    // Format duration to d h m
+    try {
+        let mins = parseInt(duration, 10);
+        let days = Math.floor(mins / 1440); mins -= days * 1440;
+        let hours = Math.floor(mins / 60); mins -= hours * 60;
+        const parts = [];
+        if (days > 0) parts.push(`${days}d`);
+        if (hours > 0) parts.push(`${hours}h`);
+        if (mins > 0 || parts.length === 0) parts.push(`${mins}m`);
+        document.getElementById('modal-service-duration').textContent = parts.join(' ');
+    } catch (_) {
+        document.getElementById('modal-service-duration').textContent = `${duration} minutes`;
+    }
     document.getElementById('modal-service-status').innerHTML = `<span class="badge bg-${status === 'Active' ? 'success' : 'danger'}">${status}</span>`;
     
     // Populate shop details

@@ -9,6 +9,7 @@ use App\Models\Service;
 use App\Models\PaymentMethod;
 use App\Models\Feedback;
 use App\Models\Notification;
+use App\Models\Shop;
 use App\Services\NotificationService;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -26,40 +27,44 @@ class AdminDashboardController extends Controller
     {
         $isOwner = auth('admin')->user()?->isOwner();
         $ownerAdminId = auth('admin')->id();
+        $ownerShopIds = collect();
+        if ($isOwner) {
+            $ownerShopIds = Shop::where('admin_id', $ownerAdminId)->pluck('id');
+        }
         
         // Get notification data
         $unreadNotifications = $this->notificationService->getUnreadCount($ownerAdminId);
         $recentNotifications = $this->notificationService->getRecentNotifications($ownerAdminId, 5);
         
         // Basic appointment statistics
-        $totalAppointments = Appointment::when($isOwner, function($q) use ($ownerAdminId) { 
-            $q->where('shop_id', $ownerAdminId); 
+        $totalAppointments = Appointment::when($isOwner, function($q) use ($ownerShopIds) { 
+            $q->whereIn('shop_id', $ownerShopIds); 
         })->count();
-        $pendingAppointments = Appointment::when($isOwner, function($q) use ($ownerAdminId) { 
-            $q->where('shop_id', $ownerAdminId); 
+        $pendingAppointments = Appointment::when($isOwner, function($q) use ($ownerShopIds) { 
+            $q->whereIn('shop_id', $ownerShopIds); 
         })->where('status', 'pending')->count();
-        $confirmedAppointments = Appointment::when($isOwner, function($q) use ($ownerAdminId) { 
-            $q->where('shop_id', $ownerAdminId); 
+        $confirmedAppointments = Appointment::when($isOwner, function($q) use ($ownerShopIds) { 
+            $q->whereIn('shop_id', $ownerShopIds); 
         })->where('status', 'confirmed')->count();
-        $completedAppointments = Appointment::when($isOwner, function($q) use ($ownerAdminId) { 
-            $q->where('shop_id', $ownerAdminId); 
+        $completedAppointments = Appointment::when($isOwner, function($q) use ($ownerShopIds) { 
+            $q->whereIn('shop_id', $ownerShopIds); 
         })->where('status', 'completed')->count();
-        $cancelledAppointments = Appointment::when($isOwner, function($q) use ($ownerAdminId) { 
-            $q->where('shop_id', $ownerAdminId); 
+        $cancelledAppointments = Appointment::when($isOwner, function($q) use ($ownerShopIds) { 
+            $q->whereIn('shop_id', $ownerShopIds); 
         })->where('status', 'cancelled')->count();
-        $todayAppointments = Appointment::when($isOwner, function($q) use ($ownerAdminId) { 
-            $q->where('shop_id', $ownerAdminId); 
+        $todayAppointments = Appointment::when($isOwner, function($q) use ($ownerShopIds) { 
+            $q->whereIn('shop_id', $ownerShopIds); 
         })->whereDate('appointment_date', now()->toDateString())->count();
         
         // Payment statistics
-        $pendingPayments = Appointment::when($isOwner, function($q) use ($ownerAdminId) { 
-            $q->where('shop_id', $ownerAdminId); 
+        $pendingPayments = Appointment::when($isOwner, function($q) use ($ownerShopIds) { 
+            $q->whereIn('shop_id', $ownerShopIds); 
         })->where('payment_status', 'unpaid')->where('payment_proof', '!=', null)->count();
-        $confirmedPayments = Appointment::when($isOwner, function($q) use ($ownerAdminId) { 
-            $q->where('shop_id', $ownerAdminId); 
+        $confirmedPayments = Appointment::when($isOwner, function($q) use ($ownerShopIds) { 
+            $q->whereIn('shop_id', $ownerShopIds); 
         })->where('payment_status', 'paid')->count();
-        $rejectedPayments = Appointment::when($isOwner, function($q) use ($ownerAdminId) { 
-            $q->where('shop_id', $ownerAdminId); 
+        $rejectedPayments = Appointment::when($isOwner, function($q) use ($ownerShopIds) { 
+            $q->whereIn('shop_id', $ownerShopIds); 
         })->where('payment_status', 'rejected')->count();
         
         // User statistics
@@ -70,22 +75,22 @@ class AdminDashboardController extends Controller
         })->count();
         
         // Service statistics
-        $totalServices = Service::when($isOwner, function($q) use ($ownerAdminId) { 
-            $q->where('shop_id', $ownerAdminId); 
+        $totalServices = Service::when($isOwner, function($q) use ($ownerShopIds) { 
+            $q->whereIn('shop_id', $ownerShopIds); 
         })->count();
-        $activeServices = Service::when($isOwner, function($q) use ($ownerAdminId) { 
-            $q->where('shop_id', $ownerAdminId); 
+        $activeServices = Service::when($isOwner, function($q) use ($ownerShopIds) { 
+            $q->whereIn('shop_id', $ownerShopIds); 
         })->where('is_active', true)->count();
         
         // Payment method statistics
-        $totalPaymentMethods = PaymentMethod::when($isOwner, function($q) use ($ownerAdminId) { 
-            $q->whereHas('shop', function($s) use ($ownerAdminId) {
-                $s->where('id', $ownerAdminId);
+        $totalPaymentMethods = PaymentMethod::when($isOwner, function($q) use ($ownerShopIds) { 
+            $q->whereHas('shop', function($s) use ($ownerShopIds) {
+                $s->whereIn('id', $ownerShopIds);
             }); 
         })->count();
-        $activePaymentMethods = PaymentMethod::when($isOwner, function($q) use ($ownerAdminId) { 
-            $q->whereHas('shop', function($s) use ($ownerAdminId) {
-                $s->where('id', $ownerAdminId);
+        $activePaymentMethods = PaymentMethod::when($isOwner, function($q) use ($ownerShopIds) { 
+            $q->whereHas('shop', function($s) use ($ownerShopIds) {
+                $s->whereIn('id', $ownerShopIds);
             }); 
         })->where('is_active', true)->count();
         
@@ -97,36 +102,36 @@ class AdminDashboardController extends Controller
         // Revenue analytics
         $totalRevenue = Service::join('appointments', 'services.id', '=', 'appointments.service_id')
             ->where('appointments.status', 'completed')
-            ->when($isOwner, function($q) use ($ownerAdminId) { 
-                $q->where('appointments.shop_id', $ownerAdminId); 
+            ->when($isOwner, function($q) use ($ownerShopIds) { 
+                $q->whereIn('appointments.shop_id', $ownerShopIds); 
             })
             ->sum('services.price');
             
         $monthlyRevenue = Service::join('appointments', 'services.id', '=', 'appointments.service_id')
             ->where('appointments.status', 'completed')
             ->whereMonth('appointments.created_at', now()->month)
-            ->when($isOwner, function($q) use ($ownerAdminId) { 
-                $q->where('appointments.shop_id', $ownerAdminId); 
+            ->when($isOwner, function($q) use ($ownerShopIds) { 
+                $q->whereIn('appointments.shop_id', $ownerShopIds); 
             })
             ->sum('services.price');
             
         $weeklyRevenue = Service::join('appointments', 'services.id', '=', 'appointments.service_id')
             ->where('appointments.status', 'completed')
             ->where('appointments.created_at', '>=', now()->subWeek())
-            ->when($isOwner, function($q) use ($ownerAdminId) { 
-                $q->where('appointments.shop_id', $ownerAdminId); 
+            ->when($isOwner, function($q) use ($ownerShopIds) { 
+                $q->whereIn('appointments.shop_id', $ownerShopIds); 
             })
             ->sum('services.price');
         
         // Service popularity analytics
-        $popularServices = Service::withCount(['appointments' => function($query) use ($isOwner, $ownerAdminId) {
+        $popularServices = Service::withCount(['appointments' => function($query) use ($isOwner, $ownerShopIds) {
             $query->where('status', 'completed');
             if ($isOwner) {
-                $query->where('shop_id', $ownerAdminId);
+                $query->whereIn('shop_id', $ownerShopIds);
             }
         }])
-        ->when($isOwner, function($q) use ($ownerAdminId) { 
-            $q->where('shop_id', $ownerAdminId); 
+        ->when($isOwner, function($q) use ($ownerShopIds) { 
+            $q->whereIn('shop_id', $ownerShopIds); 
         })
         ->orderBy('appointments_count', 'desc')
         ->limit(5)
@@ -135,8 +140,8 @@ class AdminDashboardController extends Controller
         // Monthly appointment trends
         $monthlyTrends = Appointment::selectRaw('MONTH(appointment_date) as month, COUNT(*) as count')
             ->whereYear('appointment_date', now()->year)
-            ->when($isOwner, function($q) use ($ownerAdminId) { 
-                $q->where('shop_id', $ownerAdminId); 
+            ->when($isOwner, function($q) use ($ownerShopIds) { 
+                $q->whereIn('shop_id', $ownerShopIds); 
             })
             ->groupBy('month')
             ->orderBy('month')
@@ -154,8 +159,8 @@ class AdminDashboardController extends Controller
         
         // Vehicle type analytics
         $vehicleTypeStats = Appointment::selectRaw('vehicle_type, COUNT(*) as count')
-            ->when($isOwner, function($q) use ($ownerAdminId) { 
-                $q->where('shop_id', $ownerAdminId); 
+            ->when($isOwner, function($q) use ($ownerShopIds) { 
+                $q->whereIn('shop_id', $ownerShopIds); 
             })
             ->groupBy('vehicle_type')
             ->orderBy('count', 'desc')
@@ -163,15 +168,15 @@ class AdminDashboardController extends Controller
             ->get();
         
         // Payment method usage
-        $paymentMethodUsage = PaymentMethod::withCount(['appointments' => function($query) use ($isOwner, $ownerAdminId) {
+        $paymentMethodUsage = PaymentMethod::withCount(['appointments' => function($query) use ($isOwner, $ownerShopIds) {
             $query->where('status', 'completed');
             if ($isOwner) {
-                $query->where('shop_id', $ownerAdminId);
+                $query->whereIn('shop_id', $ownerShopIds);
             }
         }])
-        ->when($isOwner, function($q) use ($ownerAdminId) { 
-            $q->whereHas('shop', function($s) use ($ownerAdminId) {
-                $s->where('id', $ownerAdminId);
+        ->when($isOwner, function($q) use ($ownerShopIds) { 
+            $q->whereHas('shop', function($s) use ($ownerShopIds) {
+                $s->whereIn('id', $ownerShopIds);
             }); 
         })
         ->orderBy('appointments_count', 'desc')
@@ -179,16 +184,16 @@ class AdminDashboardController extends Controller
         
         // Recent activity
         $recentAppointments = Appointment::with('user')
-            ->when($isOwner, function($q) use ($ownerAdminId) { 
-                $q->where('shop_id', $ownerAdminId); 
+            ->when($isOwner, function($q) use ($ownerShopIds) { 
+                $q->whereIn('shop_id', $ownerShopIds); 
             })
             ->orderBy('appointment_date', 'desc')
             ->limit(5)
             ->get();
             
-        $recentUsers = User::when($isOwner, function($q) use ($ownerAdminId) {
-            $q->whereHas('appointments', function($appt) use ($ownerAdminId) {
-                $appt->where('shop_id', $ownerAdminId);
+        $recentUsers = User::when($isOwner, function($q) use ($ownerShopIds) {
+            $q->whereHas('appointments', function($appt) use ($ownerShopIds) {
+                $appt->whereIn('shop_id', $ownerShopIds);
             });
         })->orderBy('created_at', 'desc')
             ->limit(5)
@@ -203,8 +208,8 @@ class AdminDashboardController extends Controller
         
         // Today's schedule
         $todaySchedule = Appointment::with(['user', 'service'])
-            ->when($isOwner, function($q) use ($ownerAdminId) { 
-                $q->where('shop_id', $ownerAdminId); 
+            ->when($isOwner, function($q) use ($ownerShopIds) { 
+                $q->whereIn('shop_id', $ownerShopIds); 
             })
             ->whereDate('appointment_date', now()->toDateString())
             ->orderBy('appointment_time')
@@ -212,8 +217,8 @@ class AdminDashboardController extends Controller
         
         // Upcoming appointments
         $upcomingAppointments = Appointment::with(['user', 'service'])
-            ->when($isOwner, function($q) use ($ownerAdminId) { 
-                $q->where('shop_id', $ownerAdminId); 
+            ->when($isOwner, function($q) use ($ownerShopIds) { 
+                $q->whereIn('shop_id', $ownerShopIds); 
             })
             ->whereBetween('appointment_date', [now()->toDateString(), now()->addDays(7)->toDateString()])
             ->where('status', '!=', 'cancelled')

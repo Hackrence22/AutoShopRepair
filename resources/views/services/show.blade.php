@@ -29,7 +29,20 @@
                         <div class="col-md-4">
                             <div class="p-3 border rounded">
                                 <div class="text-muted">Duration</div>
-                                <div class="fw-bold">{{ $service->duration ?? 60 }} minutes</div>
+                                <div class="fw-bold">
+                                    @php
+                                        $mins = (int) ($service->duration ?? 60);
+                                        $days = intdiv($mins, 1440);
+                                        $mins -= $days * 1440;
+                                        $hours = intdiv($mins, 60);
+                                        $mins -= $hours * 60;
+                                        $parts = [];
+                                        if ($days > 0) $parts[] = $days . 'd';
+                                        if ($hours > 0) $parts[] = $hours . 'h';
+                                        if ($mins > 0 || empty($parts)) $parts[] = $mins . 'm';
+                                        echo implode(' ', $parts);
+                                    @endphp
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-4">

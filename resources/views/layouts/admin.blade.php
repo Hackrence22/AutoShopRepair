@@ -146,6 +146,19 @@
                         <a class="sidebar-nav-link {{ request()->routeIs('admin.appointments.*') ? 'active' : '' }}" href="{{ route('admin.appointments.index') }}">
                             <i class="fas fa-calendar-check"></i>
                             <span>Appointments</span>
+                            @php
+                                $currentAdmin = auth('admin')->user();
+                                $isOwner = $currentAdmin && method_exists($currentAdmin, 'isOwner') ? $currentAdmin->isOwner() : false;
+                                $pendingAppointmentsQuery = \App\Models\Appointment::query()->where('status', 'pending');
+                                if ($isOwner) {
+                                    $ownerShopIds = \App\Models\Shop::where('admin_id', $currentAdmin->id)->pluck('id');
+                                    $pendingAppointmentsQuery->whereIn('shop_id', $ownerShopIds);
+                                }
+                                $pendingAppointmentsCount = $pendingAppointmentsQuery->count();
+                            @endphp
+                            @if($pendingAppointmentsCount > 0)
+                                <span class="notification-badge-sidebar">{{ $pendingAppointmentsCount }}</span>
+                            @endif
                         </a>
                     </li>
                     <li class="sidebar-nav-item">
@@ -234,6 +247,24 @@
                         <a class="sidebar-nav-link {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}" href="{{ route('admin.payments.index') }}">
                             <i class="fas fa-money-check-alt"></i>
                             <span>Payment Management</span>
+                            @php
+                                $currentAdmin = auth('admin')->user();
+                                $isOwner = $currentAdmin && method_exists($currentAdmin, 'isOwner') ? $currentAdmin->isOwner() : false;
+                                // All unpaid: anything not marked as 'paid' (including null)
+                                $unpaidPaymentsQuery = \App\Models\Appointment::query()
+                                    ->where(function($q){
+                                        $q->where('payment_status', '!=', 'paid')
+                                          ->orWhereNull('payment_status');
+                                    });
+                                if ($isOwner) {
+                                    $ownerShopIds = \App\Models\Shop::where('admin_id', $currentAdmin->id)->pluck('id');
+                                    $unpaidPaymentsQuery->whereIn('shop_id', $ownerShopIds);
+                                }
+                                $unpaidPaymentsCount = $unpaidPaymentsQuery->count();
+                            @endphp
+                            @if($unpaidPaymentsCount > 0)
+                                <span class="notification-badge-sidebar">{{ $unpaidPaymentsCount }}</span>
+                            @endif
                         </a>
                     </li>
                     <li class="sidebar-nav-item">

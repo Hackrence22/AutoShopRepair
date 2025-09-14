@@ -15,14 +15,14 @@
                         </div>
                         <div class="col-md-6">
                             <h1 class="display-5 fw-bold text-primary mb-2">{{ $shop->name }}</h1>
-                            <p class="lead text-muted mb-3">{{ $shop->full_address }}</p>
+                            <p class="lead text-white bg-primary px-3 py-2 rounded-3 d-inline-block mb-3">{{ $shop->full_address }}</p>
                             <div class="d-flex gap-3 mb-3">
                                 <a href="mailto:{{ $shop->email }}" class="btn btn-outline-primary">
                                     <i class="fas fa-envelope me-2"></i>{{ $shop->email }}
                                 </a>
                                 @if($shop->hasMapEmbedUrl())
                                     <button type="button" 
-                                            class="btn btn-outline-info" 
+                                            class="btn btn-info text-white" 
                                             data-bs-toggle="modal" 
                                             data-bs-target="#mapModal"
                                             data-shop-name="{{ $shop->name }}"
@@ -198,7 +198,7 @@
             <!-- Map Section -->
             @if($shop->hasMapEmbedUrl())
                 <div class="card border-0 shadow-sm mt-4">
-                    <div class="card-header bg-warning text-dark">
+                    <div class="card-header bg-warning text-white">
                         <h5 class="mb-0"><i class="fas fa-map-marker-alt me-2"></i>Location</h5>
                     </div>
                     <div class="card-body p-0">

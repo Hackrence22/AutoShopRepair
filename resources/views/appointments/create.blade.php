@@ -116,7 +116,7 @@
                                                 <i class="fas fa-user me-2"></i>Full Name
                                             </label>
                                             <input type="text" class="form-control modern-input" id="customer_name" name="customer_name" 
-                           value="{{ Auth::user()->name }}" required>
+                           value="{{ old('customer_name', Auth::user()->name) }}" required>
                 </div>
                                     </div>
                                     <div class="col-md-6 mb-4">
@@ -125,7 +125,7 @@
                                                 <i class="fas fa-envelope me-2"></i>Email Address
                                             </label>
                                             <input type="email" class="form-control modern-input" id="email" name="email" 
-                           value="{{ Auth::user()->email }}" required readonly>
+                           value="{{ old('email', Auth::user()->email) }}" required readonly>
                                         </div>
                 </div>
             </div>
@@ -137,7 +137,7 @@
                                                 <i class="fas fa-phone me-2"></i>Phone Number
                                             </label>
                                             <input type="tel" class="form-control modern-input" id="phone" name="phone" 
-                           value="{{ Auth::user()->phone }}" required>
+                           value="{{ old('phone', Auth::user()->phone) }}" required>
                 </div>
                                     </div>
                                 </div>
@@ -163,10 +163,10 @@
                                             </label>
                                             <select class="form-select modern-select" id="vehicle_type" name="vehicle_type" required>
                         <option value="">Select Vehicle Type</option>
-                        <option value="Car">Car</option>
-                        <option value="Motorcycle">Motorcycle</option>
-                        <option value="SUV">SUV</option>
-                        <option value="Truck">Truck</option>
+                        <option value="Car" {{ old('vehicle_type')==='Car' ? 'selected' : '' }}>Car</option>
+                        <option value="Motorcycle" {{ old('vehicle_type')==='Motorcycle' ? 'selected' : '' }}>Motorcycle</option>
+                        <option value="SUV" {{ old('vehicle_type')==='SUV' ? 'selected' : '' }}>SUV</option>
+                        <option value="Truck" {{ old('vehicle_type')==='Truck' ? 'selected' : '' }}>Truck</option>
                     </select>
                                         </div>
                                     </div>
@@ -175,7 +175,7 @@
                                             <label for="vehicle_model" class="form-label">
                                                 <i class="fas fa-tag me-2"></i>Vehicle Model
                                             </label>
-                                            <input type="text" class="form-control modern-input" id="vehicle_model" name="vehicle_model" required>
+                                            <input type="text" class="form-control modern-input" id="vehicle_model" name="vehicle_model" value="{{ old('vehicle_model') }}" required>
                                         </div>
                 </div>
             </div>
@@ -186,7 +186,7 @@
                                             <label for="vehicle_year" class="form-label">
                                                 <i class="fas fa-calendar-alt me-2"></i>Vehicle Year
                                             </label>
-                                            <input type="text" class="form-control modern-input" id="vehicle_year" name="vehicle_year" required>
+                                            <input type="text" class="form-control modern-input" id="vehicle_year" name="vehicle_year" value="{{ old('vehicle_year') }}" required>
                                         </div>
                                     </div>
                                 </div>
@@ -216,8 +216,19 @@
                             <option value="{{ $service->id }}" 
                                     data-price="{{ $service->price }}"
                                     data-description="{{ $service->description }}"
-                                    data-duration="{{ $service->duration }}">
-                                {{ $service->name }} - ₱{{ number_format($service->price, 2) }} ({{ $service->duration }} min)
+                                    data-duration="{{ $service->duration }}"
+                                    {{ (string)old('service_id', request('service_id')) === (string)$service->id ? 'selected' : '' }}>
+                                @php
+                                    $mins = (int) $service->duration;
+                                    $d = intdiv($mins, 1440); $mins -= $d * 1440;
+                                    $h = intdiv($mins, 60); $mins -= $h * 60;
+                                    $parts = [];
+                                    if ($d > 0) $parts[] = $d . 'd';
+                                    if ($h > 0) $parts[] = $h . 'h';
+                                    if ($mins > 0 || empty($parts)) $parts[] = $mins . 'm';
+                                    $human = implode(' ', $parts);
+                                @endphp
+                                {{ $service->name }} - ₱{{ number_format($service->price, 2) }} ({{ $human }})
                             </option>
                         @endforeach
                     </select>
@@ -232,7 +243,7 @@
                                                     <div class="service-meta">
                                                         <span class="service-duration">
                                                             <i class="fas fa-clock me-1"></i>
-                                                            <span id="service-duration"></span> minutes
+                                                            <span id="service-duration"></span>
                                                         </span>
                                                     </div>
                                                 </div>
@@ -255,7 +266,8 @@
                                                                 data-avatar="{{ $technician->profile_picture_url }}"
                                                                 data-bio="{{ $technician->bio }}"
                                                                 data-certifications="{{ $technician->certifications }}"
-                                                                data-hourly-rate="{{ $technician->hourly_rate }}">
+                                                                data-hourly-rate="{{ $technician->hourly_rate }}"
+                                                                {{ (string)old('technician_id') === (string)$technician->id ? 'selected' : '' }}>
                                                             {{ $technician->name }}
                                                             @if($technician->specialization)
                                                                 - {{ $technician->specialization }}
@@ -343,7 +355,7 @@
                                 @endphp
                                 <option value="{{ $startTime }}" 
                                         {{ $slots == 0 || $isPast ? 'disabled' : '' }} 
-                                        {{ request('time') == $startTime ? 'selected' : '' }}>
+                                        {{ (request('time') == $startTime || old('appointment_time') == $startTime) ? 'selected' : '' }}>
                                     {{ \Carbon\Carbon::createFromFormat('H:i', $startTime)->format('h:i A') }} - 
                                     {{ \Carbon\Carbon::createFromFormat('H:i', $endTime)->format('h:i A') }}
                                     ({{ $slots }} slots left)
@@ -461,7 +473,7 @@
                                                 <i class="fas fa-comment me-2"></i>Notes & Instructions
                                             </label>
                                             <textarea class="form-control modern-textarea" id="description" name="description" rows="4" 
-                                                      placeholder="Describe any specific issues, concerns, or special instructions for your vehicle..."></textarea>
+                                                      placeholder="Describe any specific issues, concerns, or special instructions for your vehicle...">{{ old('description') }}</textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -563,7 +575,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 serviceDetails.style.display = 'none';
             }
             if (duration && serviceDuration) {
-                serviceDuration.textContent = duration;
+                let mins = parseInt(duration, 10);
+                let days = Math.floor(mins / 1440); mins -= days * 1440;
+                let hours = Math.floor(mins / 60); mins -= hours * 60;
+                const parts = [];
+                if (days > 0) parts.push(`${days}d`);
+                if (hours > 0) parts.push(`${hours}h`);
+                if (mins > 0 || parts.length === 0) parts.push(`${mins}m`);
+                serviceDuration.textContent = parts.join(' ');
                 if (!description) serviceDetails.style.display = 'block';
             }
         });
@@ -755,14 +774,30 @@ document.addEventListener('DOMContentLoaded', function() {
     // Form validation enhancement
     const form = document.querySelector('.booking-form');
     if (form) {
+        // Live remove invalid state when typing/selecting
+        form.addEventListener('input', function(ev) {
+            const t = ev.target;
+            if (t && t.classList.contains('is-invalid')) {
+                if (t.value && t.value.trim() !== '') {
+                    t.classList.remove('is-invalid');
+                }
+            }
+        });
+
         form.addEventListener('submit', function(e) {
             const requiredFields = form.querySelectorAll('[required]');
             let isValid = true;
+            const missing = [];
 
             requiredFields.forEach(field => {
-                if (!field.value.trim()) {
+                const val = (field.value || '').toString().trim();
+                if (!val) {
                     field.classList.add('is-invalid');
                     isValid = false;
+                    // Build a human label
+                    const label = form.querySelector(`label[for="${field.id}"]`);
+                    const title = label ? label.textContent.replace(/\s+/g,' ').trim() : (field.name || 'This field');
+                    missing.push(title);
                 } else {
                     field.classList.remove('is-invalid');
                 }
@@ -770,10 +805,34 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (!isValid) {
                 e.preventDefault();
+                // Show a temporary summary alert at top of form
+                let alert = document.getElementById('clientValidationAlert');
+                if (!alert) {
+                    alert = document.createElement('div');
+                    alert.id = 'clientValidationAlert';
+                    alert.className = 'alert alert-danger alert-modern';
+                    alert.innerHTML = '<div class="alert-icon"><i class="fas fa-exclamation-triangle"></i></div><div class="alert-content"><h6 class="alert-title">Please fill the required fields:</h6><ul class="alert-list" id="clientValidationList"></ul></div>';
+                    form.prepend(alert);
+                }
+                const list = document.getElementById('clientValidationList');
+                if (list) {
+                    list.innerHTML = '';
+                    missing.slice(0,6).forEach(m => {
+                        const li = document.createElement('li');
+                        li.textContent = m;
+                        list.appendChild(li);
+                    });
+                    if (missing.length > 6) {
+                        const li = document.createElement('li');
+                        li.textContent = `+${missing.length - 6} more`;
+                        list.appendChild(li);
+                    }
+                }
                 // Scroll to first invalid field
                 const firstInvalid = form.querySelector('.is-invalid');
                 if (firstInvalid) {
                     firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstInvalid.focus({ preventScroll: true });
                 }
             }
         });

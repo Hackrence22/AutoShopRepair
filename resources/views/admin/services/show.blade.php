@@ -32,7 +32,20 @@
                         </tr>
                         <tr>
                             <td class="fw-semibold text-muted">Duration</td>
-                            <td>{{ $service->duration }} minutes</td>
+                            <td>
+                                @php
+                                    $mins = (int) $service->duration;
+                                    $days = intdiv($mins, 1440);
+                                    $mins -= $days * 1440;
+                                    $hours = intdiv($mins, 60);
+                                    $mins -= $hours * 60;
+                                    $parts = [];
+                                    if ($days > 0) $parts[] = $days . 'd';
+                                    if ($hours > 0) $parts[] = $hours . 'h';
+                                    if ($mins > 0 || empty($parts)) $parts[] = $mins . 'm';
+                                    echo implode(' ', $parts);
+                                @endphp
+                            </td>
                         </tr>
                         <tr>
                             <td class="fw-semibold text-muted">Status</td>

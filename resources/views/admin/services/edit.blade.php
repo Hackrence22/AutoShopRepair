@@ -87,12 +87,25 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="duration" class="form-label">Duration (minutes)</label>
-                                    <input type="number" min="1" class="form-control @error('duration') is-invalid @enderror" 
-                                           id="duration" name="duration" value="{{ old('duration', $service->duration) }}" required>
-                                    @error('duration')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                    <label for="duration" class="form-label">Duration</label>
+                                    <div class="input-group">
+                                        @php
+                                            $durationValue = $service->duration;
+                                            $durationUnit = 'minutes';
+                                            if ($durationValue % 1440 === 0) { $durationUnit = 'days'; $durationValue = $durationValue / 1440; }
+                                            elseif ($durationValue % 60 === 0) { $durationUnit = 'hours'; $durationValue = $durationValue / 60; }
+                                        @endphp
+                                        <input type="number" min="1" class="form-control @error('duration') is-invalid @enderror" 
+                                               id="duration" name="duration" value="{{ old('duration', $durationValue) }}" required>
+                                        <select class="form-select" name="duration_unit">
+                                            <option value="minutes" {{ old('duration_unit', $durationUnit) === 'minutes' ? 'selected' : '' }}>Minutes</option>
+                                            <option value="hours" {{ old('duration_unit', $durationUnit) === 'hours' ? 'selected' : '' }}>Hours</option>
+                                            <option value="days" {{ old('duration_unit', $durationUnit) === 'days' ? 'selected' : '' }}>Days</option>
+                                        </select>
+                                        @error('duration')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
                                 </div>
                             </div>
                         </div>

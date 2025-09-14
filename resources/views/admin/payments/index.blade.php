@@ -95,6 +95,7 @@
                                 </td>
                                 <td>
                                     @if($payment->payment_status === 'unpaid')
+                                        @php $isCash = strtolower($payment->paymentMethod->role_type ?? '') === 'cash'; @endphp
                                         @if($payment->payment_proof)
                                             <div class="d-flex gap-1">
                                                 <form action="{{ route('admin.payments.confirm', $payment->id) }}" method="POST" class="d-inline">
@@ -110,6 +111,13 @@
                                                     </button>
                                                 </form>
                                             </div>
+                                        @elseif($isCash)
+                                            <form action="{{ route('admin.payments.confirm', $payment->id) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                <button type="submit" class="btn btn-sm btn-primary" onclick="return confirm('Mark this cash payment as paid?')">
+                                                    <i class="fas fa-money-bill-wave"></i> Mark as Paid
+                                                </button>
+                                            </form>
                                         @else
                                             <span class="text-muted small">Waiting for proof</span>
                                         @endif

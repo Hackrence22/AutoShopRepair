@@ -42,7 +42,24 @@ class AnalyticsController extends Controller
         $totalRevenue = $revenueData->sum('revenue');
         $averageRevenue = $revenueData->avg('revenue');
 
-        return view('admin.analytics.revenue', compact('revenueData', 'totalRevenue', 'averageRevenue', 'period'));
+        // Owner-scoped totals: completed appointments count and distinct services used
+        $totalAppointments = Appointment::where('status', 'completed')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->when($shopFilter, function($query) use ($shopFilter) {
+                $query->where('shop_id', $shopFilter);
+            })
+            ->count();
+
+        $totalServices = Service::join('appointments', 'services.id', '=', 'appointments.service_id')
+            ->where('appointments.status', 'completed')
+            ->whereBetween('appointments.created_at', [$startDate, $endDate])
+            ->when($shopFilter, function($query) use ($shopFilter) {
+                $query->where('appointments.shop_id', $shopFilter);
+            })
+            ->distinct('services.id')
+            ->count('services.id');
+
+        return view('admin.analytics.revenue', compact('revenueData', 'totalRevenue', 'averageRevenue', 'period', 'totalAppointments', 'totalServices'));
     }
 
     public function appointments(Request $request)
