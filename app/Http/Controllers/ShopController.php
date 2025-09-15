@@ -9,7 +9,8 @@ class ShopController extends Controller
 {
     public function index()
     {
-        $shops = Shop::with(['services', 'slotSettings'])
+        $shops = Shop::with(['services', 'slotSettings', 'admin'])
+            ->withAvg('ratings', 'rating')
             ->active()
             ->ordered()
             ->paginate(6);
@@ -23,7 +24,9 @@ class ShopController extends Controller
             $query->where('is_active', true);
         }, 'slotSettings' => function($query) {
             $query->where('is_active', true);
-        }]);
+        }, 'ratings' => function($query) {
+            $query->latest()->with('user:id,name,profile_picture,avatar');
+        }, 'admin']);
         
         return view('shops.show', compact('shop'));
     }

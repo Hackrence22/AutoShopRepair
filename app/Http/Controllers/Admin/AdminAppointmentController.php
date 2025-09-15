@@ -147,6 +147,7 @@ class AdminAppointmentController extends Controller
         }
 
         $appointment->update($validated);
+        
         // Notify user of status change
         Notification::create([
             'user_id' => $appointment->user_id,
@@ -156,12 +157,31 @@ class AdminAppointmentController extends Controller
             'message' => 'Your appointment #' . $appointment->id . ' status is now: ' . ucfirst($appointment->status) . '.',
             'data' => ['appointment_id' => $appointment->id],
         ]);
+        
+        // Notify shop owner about status change (if different from current admin)
+        if ($appointment->shop && $appointment->shop->admin_id && $appointment->shop->admin_id !== auth('admin')->id()) {
+            Notification::create([
+                'admin_id' => $appointment->shop->admin_id,
+                'shop_id' => $appointment->shop->id,
+                'type' => 'appointment_status_change',
+                'title' => 'Appointment Status Changed',
+                'message' => "Appointment #{$appointment->id} for {$appointment->customer_name} status changed to " . ucfirst($appointment->status) . " by " . auth('admin')->user()->name,
+                'data' => [
+                    'appointment_id' => $appointment->id,
+                    'customer_name' => $appointment->customer_name,
+                    'status' => $appointment->status,
+                    'changed_by' => auth('admin')->user()->name,
+                    'appointment_date' => $appointment->appointment_date->format('Y-m-d'),
+                    'appointment_time' => $appointment->appointment_time->format('H:i')
+                ],
+            ]);
+        }
         // SMS: status change
         try {
             $sms = app(SmsService::class);
             $to = $sms->toE164($appointment->phone);
             if ($to) {
-                $sms->send($to, 'Your appointment #' . $appointment->id . ' status is now: ' . ucfirst($appointment->status) . '.');
+                $sms->send($to, 'Hi ' . $appointment->customer_name . '! Your appointment status has been updated to: ' . ucfirst($appointment->status) . '. For ' . $appointment->appointment_date->format('M d, Y') . ' at ' . $appointment->appointment_time->format('h:i A') . '. Thank you! 📱');
             }
         } catch (\Throwable $e) {}
 
@@ -187,6 +207,7 @@ class AdminAppointmentController extends Controller
         if ($validated['status'] === 'cancelled') {
             $appointment->update(['cancelled_at' => now()]);
         }
+        
         // Notify user of status change
         Notification::create([
             'user_id' => $appointment->user_id,
@@ -196,17 +217,36 @@ class AdminAppointmentController extends Controller
             'message' => 'Your appointment #' . $appointment->id . ' status is now: ' . ucfirst($appointment->status) . '.',
             'data' => ['appointment_id' => $appointment->id],
         ]);
+        
+        // Notify shop owner about status change (if different from current admin)
+        if ($appointment->shop && $appointment->shop->admin_id && $appointment->shop->admin_id !== auth('admin')->id()) {
+            Notification::create([
+                'admin_id' => $appointment->shop->admin_id,
+                'shop_id' => $appointment->shop->id,
+                'type' => 'appointment_status_change',
+                'title' => 'Appointment Status Changed',
+                'message' => "Appointment #{$appointment->id} for {$appointment->customer_name} status changed to " . ucfirst($appointment->status) . " by " . auth('admin')->user()->name,
+                'data' => [
+                    'appointment_id' => $appointment->id,
+                    'customer_name' => $appointment->customer_name,
+                    'status' => $appointment->status,
+                    'changed_by' => auth('admin')->user()->name,
+                    'appointment_date' => $appointment->appointment_date->format('Y-m-d'),
+                    'appointment_time' => $appointment->appointment_time->format('H:i')
+                ],
+            ]);
+        }
         // SMS: status change
         try {
             $sms = app(SmsService::class);
             $to = $sms->toE164($appointment->phone);
             if ($to) {
-                $sms->send($to, 'Your appointment #' . $appointment->id . ' status is now: ' . ucfirst($appointment->status) . '.');
+                $sms->send($to, 'Hi ' . $appointment->customer_name . '! Your appointment status has been updated to: ' . ucfirst($appointment->status) . '. For ' . $appointment->appointment_date->format('M d, Y') . ' at ' . $appointment->appointment_time->format('h:i A') . '. Thank you! 📱');
             }
         } catch (\Throwable $e) {}
 
         return redirect()->back()
-            ->with('success', 'Appointment status updated successfully!');
+->with('success', 'Appointment status updated successfully!');
     }
 
     public function approve(Appointment $appointment)
@@ -215,6 +255,7 @@ class AdminAppointmentController extends Controller
             return redirect()->back()->with('error', 'Please assign a technician before approving this appointment.');
         }
         $appointment->update(['status' => 'approved']);
+        
         // Notify user of approval
         Notification::create([
             'user_id' => $appointment->user_id,
@@ -224,12 +265,30 @@ class AdminAppointmentController extends Controller
             'message' => 'Your appointment #' . $appointment->id . ' has been approved!',
             'data' => ['appointment_id' => $appointment->id],
         ]);
+        
+        // Notify shop owner about approval (if different from current admin)
+        if ($appointment->shop && $appointment->shop->admin_id && $appointment->shop->admin_id !== auth('admin')->id()) {
+            Notification::create([
+                'admin_id' => $appointment->shop->admin_id,
+                'shop_id' => $appointment->shop->id,
+                'type' => 'appointment_approved',
+                'title' => 'Appointment Approved',
+                'message' => "Appointment #{$appointment->id} for {$appointment->customer_name} has been approved by " . auth('admin')->user()->name,
+                'data' => [
+                    'appointment_id' => $appointment->id,
+                    'customer_name' => $appointment->customer_name,
+                    'approved_by' => auth('admin')->user()->name,
+                    'appointment_date' => $appointment->appointment_date->format('Y-m-d'),
+                    'appointment_time' => $appointment->appointment_time->format('H:i')
+                ],
+            ]);
+        }
         // SMS: approved
         try {
             $sms = app(SmsService::class);
             $to = $sms->toE164($appointment->phone);
             if ($to) {
-                $sms->send($to, 'Your appointment #' . $appointment->id . ' has been approved.');
+                $sms->send($to, 'Hi ' . $appointment->customer_name . '! Great news! Your appointment for ' . $appointment->appointment_date->format('M d, Y') . ' at ' . $appointment->appointment_time->format('h:i A') . ' has been APPROVED! 🎉 Please arrive on time. See you soon!');
             }
         } catch (\Throwable $e) {}
         return redirect()->back()->with('success', 'Appointment approved successfully!');
@@ -241,6 +300,7 @@ class AdminAppointmentController extends Controller
             'status' => 'cancelled',
             'cancelled_at' => now()
         ]);
+        
         // Notify user of rejection
         Notification::create([
             'user_id' => $appointment->user_id,
@@ -250,12 +310,30 @@ class AdminAppointmentController extends Controller
             'message' => 'Your appointment #' . $appointment->id . ' has been rejected. Please contact us for more information.',
             'data' => ['appointment_id' => $appointment->id],
         ]);
+        
+        // Notify shop owner about rejection (if different from current admin)
+        if ($appointment->shop && $appointment->shop->admin_id && $appointment->shop->admin_id !== auth('admin')->id()) {
+            Notification::create([
+                'admin_id' => $appointment->shop->admin_id,
+                'shop_id' => $appointment->shop->id,
+                'type' => 'appointment_rejected',
+                'title' => 'Appointment Rejected',
+                'message' => "Appointment #{$appointment->id} for {$appointment->customer_name} has been rejected by " . auth('admin')->user()->name,
+                'data' => [
+                    'appointment_id' => $appointment->id,
+                    'customer_name' => $appointment->customer_name,
+                    'rejected_by' => auth('admin')->user()->name,
+                    'appointment_date' => $appointment->appointment_date->format('Y-m-d'),
+                    'appointment_time' => $appointment->appointment_time->format('H:i')
+                ],
+            ]);
+        }
         // SMS: rejected
         try {
             $sms = app(SmsService::class);
             $to = $sms->toE164($appointment->phone);
             if ($to) {
-                $sms->send($to, 'Your appointment #' . $appointment->id . ' has been rejected.');
+                $sms->send($to, 'Hi ' . $appointment->customer_name . ', we\'re sorry but your appointment for ' . $appointment->appointment_date->format('M d, Y') . ' at ' . $appointment->appointment_time->format('h:i A') . ' has been cancelled. Please contact us to reschedule. We apologize for any inconvenience. 📞');
             }
         } catch (\Throwable $e) {}
         return redirect()->back()

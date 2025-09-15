@@ -12,6 +12,13 @@
                     <div class="row align-items-center">
                         <div class="col-md-3 text-center">
                             <img src="{{ $shop->image_url }}" alt="{{ $shop->name }}" class="rounded-circle border border-3 border-primary" style="width: 120px; height: 120px; object-fit: cover;">
+                            <div class="mt-2">
+                                <span class="badge bg-secondary text-white">
+                                    <i class="fas fa-star me-1" style="color:#ffc107;"></i>
+                                    {{ $shop->average_rating ? number_format($shop->average_rating, 1) : 'No ratings yet' }}
+                                </span>
+                                <span class="text-muted small ms-2">({{ $shop->ratings->count() }} reviews)</span>
+                            </div>
                         </div>
                         <div class="col-md-6">
                             <h1 class="display-5 fw-bold text-primary mb-2">{{ $shop->name }}</h1>
@@ -63,8 +70,11 @@
                             <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Shop Information</h5>
                         </div>
                         <div class="card-body">
-                            <div class="mb-3">
-                                <span class="fw-bold text-muted">Owner:</span> {{ $shop->owner_name }}
+                            <div class="mb-3 d-flex align-items-center">
+                                <img src="{{ optional($shop->admin)->profile_picture ? asset('storage/' . $shop->admin->profile_picture) : asset('images/default-profile.png') }}" class="rounded-circle me-2" style="width:32px;height:32px;object-fit:cover;">
+                                <div>
+                                    <span class="fw-bold text-muted">Owner:</span> {{ $shop->owner_name }}
+                                </div>
                             </div>
                             <div class="mb-3">
                                 <span class="fw-bold text-muted">Operating Hours:</span><br>
@@ -233,6 +243,78 @@
                 </div>
             @endif
 
+            <!-- Ratings Section -->
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-star me-2"></i>Ratings</h5>
+                    <span class="small">Average: {{ $shop->average_rating ? number_format($shop->average_rating, 1) : 'N/A' }} ({{ $shop->ratings->count() }} reviews)</span>
+                </div>
+                <div class="card-body">
+                    @auth
+                        <form method="POST" action="{{ route('shops.ratings.store', $shop) }}" class="mb-4" id="ratingForm">
+                            @csrf
+                            <div class="row g-3 align-items-center">
+                                <div class="col-md-3">
+                                    <label class="form-label mb-1">Your Rating</label>
+                                    <div id="starRating" class="d-flex align-items-center" data-selected="0" style="gap:6px; font-size: 1.25rem; cursor: pointer;">
+                                        <i class="fas fa-star text-muted" data-value="1"></i>
+                                        <i class="fas fa-star text-muted" data-value="2"></i>
+                                        <i class="fas fa-star text-muted" data-value="3"></i>
+                                        <i class="fas fa-star text-muted" data-value="4"></i>
+                                        <i class="fas fa-star text-muted" data-value="5"></i>
+                                    </div>
+                                    <input type="hidden" name="rating" id="rating" value="" required>
+                                    @error('rating')
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="col-md-7">
+                                    <label for="comment" class="form-label mb-0">Comment (optional)</label>
+                                    <input id="comment" name="comment" type="text" class="form-control @error('comment') is-invalid @enderror" placeholder="Share your experience..." maxlength="2000">
+                                    @error('comment')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="col-md-2 d-grid">
+                                    <button type="submit" class="btn btn-secondary mt-4"><i class="fas fa-paper-plane me-1"></i>Submit</button>
+                                </div>
+                            </div>
+                        </form>
+                    @else
+                        <div class="alert alert-light border">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Please <a href="{{ route('login') }}" class="text-decoration-underline">login</a> to rate this shop.
+                        </div>
+                    @endauth
+
+                    @if($shop->ratings->count() > 0)
+                        <ul class="list-group list-group-flush">
+                            @foreach($shop->ratings as $rating)
+                                <li class="list-group-item">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <img src="{{ $rating->user->profile_picture_url }}" onerror="this.onerror=null;this.src='{{ $rating->user->avatar ?? asset('images/default-profile.png') }}';" class="rounded-circle me-2" style="width:28px;height:28px;object-fit:cover;">
+                                            <strong>{{ $rating->user->name }}</strong>
+                                            <span class="ms-2">
+                                                @for($i=1; $i<=5; $i++)
+                                                    <i class="fas fa-star" style="color: {{ $i <= $rating->rating ? '#ffc107' : '#e4e5e9' }};"></i>
+                                                @endfor
+                                            </span>
+                                            @if($rating->comment)
+                                                <div class="text-muted small mt-1">{{ $rating->comment }}</div>
+                                            @endif
+                                        </div>
+                                        <div class="text-muted small">{{ $rating->created_at->diffForHumans() }}</div>
+                                    </div>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @else
+                        <div class="text-center text-muted py-3">No ratings yet.</div>
+                    @endif
+                </div>
+            </div>
+
             <!-- Action Buttons -->
             <div class="text-center mt-4">
                 <a href="{{ route('shops.index') }}" class="btn btn-outline-secondary me-2">
@@ -352,6 +434,32 @@
 
 @push('scripts')
 <script>
+// Star rating widget
+document.addEventListener('DOMContentLoaded', function() {
+    const starContainer = document.getElementById('starRating');
+    const ratingInput = document.getElementById('rating');
+    if (starContainer && ratingInput) {
+        const stars = Array.from(starContainer.querySelectorAll('i.fas.fa-star'));
+        function paint(n) {
+            stars.forEach(function(star, idx) {
+                star.style.color = (idx < n) ? '#ffc107' : '#e4e5e9';
+                star.classList.toggle('text-muted', !(idx < n));
+            });
+        }
+        stars.forEach(function(star) {
+            star.addEventListener('mouseover', function() { paint(parseInt(star.dataset.value, 10)); });
+            star.addEventListener('mouseout', function() { paint(parseInt(starContainer.dataset.selected || '0', 10)); });
+            star.addEventListener('click', function() {
+                const val = parseInt(star.dataset.value, 10);
+                starContainer.dataset.selected = String(val);
+                ratingInput.value = String(val);
+                paint(val);
+            });
+        });
+        paint(0);
+    }
+});
+
 function showServiceDetails(serviceId) {
     const content = document.getElementById('serviceDetailsContent');
     content.innerHTML = '<div class="text-center text-muted py-5"><i class="fas fa-spinner fa-spin fa-2x"></i></div>';

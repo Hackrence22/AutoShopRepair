@@ -25,6 +25,8 @@ class User extends Authenticatable
         'phone',
         'address',
         'profile_picture',
+        'google_id',
+        'avatar',
     ];
 
     /**
@@ -56,6 +58,9 @@ class User extends Authenticatable
     {
         if ($this->profile_picture) {
             return asset('storage/' . $this->profile_picture);
+        }
+        if ($this->avatar) {
+            return $this->avatar;
         }
         return asset('images/default-profile.png');
     }

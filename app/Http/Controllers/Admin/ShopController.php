@@ -17,6 +17,8 @@ class ShopController extends Controller
     {
         $q = request('q');
         $shops = Shop::with(['services', 'slotSettings', 'appointments'])
+            ->withAvg('ratings', 'rating')
+            ->withCount('ratings')
             ->when(auth('admin')->user()?->isOwner(), function($query) {
                 $adminId = auth('admin')->id();
                 $adminName = auth('admin')->user()->name;
@@ -129,7 +131,13 @@ class ShopController extends Controller
             $ownerOk = ($shop->admin_id === auth('admin')->id()) || (is_null($shop->admin_id) && $shop->owner_name === auth('admin')->user()->name);
             if (!$ownerOk) { abort(403); }
         }
-        $shop->load(['services', 'slotSettings', 'appointments']);
+        $shop->load([
+            'services', 
+            'slotSettings', 
+            'appointments',
+            'ratings' => function($q) { $q->latest()->with('user:id,name,profile_picture'); },
+            'admin'
+        ])->loadAvg('ratings', 'rating')->loadCount('ratings');
         return view('admin.shops.show', compact('shop'));
     }
 

@@ -250,6 +250,16 @@ class AppointmentController extends Controller
             if ($appointment->payment_proof) {
             $this->notificationService->notifyPaymentSubmission($appointment);
         }
+        
+        // SMS: appointment booked confirmation
+        try {
+            $sms = app(SmsService::class);
+            $to = $sms->toE164($appointment->phone);
+            if ($to) {
+                $sms->send($to, 'Hi ' . $appointment->customer_name . '! Your auto repair appointment has been booked for ' . $appointment->appointment_date->format('M d, Y') . ' at ' . $appointment->appointment_time->format('h:i A') . '. We\'ll review and confirm shortly. Thank you for choosing us! 🚗');
+            }
+        } catch (\Throwable $e) {}
+        
         return redirect()->route('appointments.index')
             ->with('success', 'Appointment booked successfully!');
     }

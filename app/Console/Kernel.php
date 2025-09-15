@@ -21,6 +21,16 @@ class Kernel extends ConsoleKernel
         $schedule->command('appointments:reset-daily')
                 ->dailyAt('00:00')
                 ->withoutOverlapping();
+
+        // Send 1-hour appointment reminders every minute
+        $schedule->command('appointments:send-hourly-reminders')
+                ->everyMinute()
+                ->withoutOverlapping();
+
+        // Send 5-minute appointment reminders every minute
+        $schedule->command('appointments:send-reminders')
+                ->everyMinute()
+                ->withoutOverlapping();
     }
 
     /**

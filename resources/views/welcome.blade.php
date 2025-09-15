@@ -68,7 +68,7 @@
                         @php
                             $shopsWithSlots = \App\Models\Shop::with(['slotSettings' => function($query) {
                                 $query->where('is_active', true);
-                            }])->active()->ordered()->get();
+                            }])->withAvg('ratings', 'rating')->withCount('ratings')->active()->ordered()->get();
                             $shopsWithSlots = $shopsWithSlots->filter(function($shop) {
                                 return $shop->slotSettings->count() > 0;
                             });
@@ -96,6 +96,15 @@
                                         <div>
                                             <h6 class="mb-0 fw-bold text-start">{{ $shop->name }}</h6>
                                             <small class="text-muted">{{ $shop->full_address }}</small>
+                                            <div class="mt-1 d-flex align-items-center" style="gap:6px;">
+                                                <span>
+                                                    @php $avg = (float) ($shop->average_rating ?? 0); @endphp
+                                                    @for($i=1;$i<=5;$i++)
+                                                        <i class="fas fa-star" style="color: {{ $i <= round($avg) ? '#ffc107' : '#e4e5e9' }};"></i>
+                                                    @endfor
+                                                </span>
+                                                <small class="text-muted">{{ $shop->average_rating ? number_format($shop->average_rating, 1) : 'No ratings' }} ({{ $shop->ratings_count ?? 0 }})</small>
+                                            </div>
                                         </div>
                                         <div class="ms-auto">
                                             @if($shop->isCurrentlyOpen())

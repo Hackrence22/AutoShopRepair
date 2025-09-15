@@ -72,7 +72,7 @@ class PaymentManagementController extends Controller
             $sms = app(SmsService::class);
             $to = $sms->toE164($appointment->phone);
             if ($to) {
-                $sms->send($to, 'Payment confirmed for appointment #' . $appointment->id . '. Thank you!');
+                $sms->send($to, 'Hi ' . $appointment->customer_name . '! 🎉 Your payment has been confirmed! Your appointment for ' . $appointment->appointment_date->format('M d, Y') . ' at ' . $appointment->appointment_time->format('h:i A') . ' is all set. Thank you for your business!');
             }
         } catch (\Throwable $e) {}
         
@@ -94,7 +94,7 @@ class PaymentManagementController extends Controller
             $sms = app(SmsService::class);
             $to = $sms->toE164($appointment->phone);
             if ($to) {
-                $sms->send($to, 'Payment for appointment #' . $appointment->id . ' was rejected. Please check details or contact support.');
+                $sms->send($to, 'Hi ' . $appointment->customer_name . ', we need to verify your payment for your appointment on ' . $appointment->appointment_date->format('M d, Y') . ' at ' . $appointment->appointment_time->format('h:i A') . '. Please contact us with correct payment details. Thank you! 📞');
             }
         } catch (\Throwable $e) {}
         

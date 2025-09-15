@@ -30,7 +30,9 @@ class Appointment extends Model
         'payment_method_id',
         'payment_proof',
         'reference_number',
-        'payment_status'
+        'payment_status',
+        'reminder_sent',
+        'hourly_reminder_sent'
     ];
 
     protected $casts = [

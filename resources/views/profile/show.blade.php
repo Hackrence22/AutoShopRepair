@@ -7,9 +7,7 @@ use Illuminate\Support\Facades\Storage;
 @endphp
 
 @php
-    $profilePic = Auth::user()->profile_picture && Storage::disk('public')->exists(Auth::user()->profile_picture)
-        ? asset('storage/' . Auth::user()->profile_picture)
-        : asset('images/default-profile.png');
+    $profilePic = Auth::user()->profile_picture_url;
 @endphp
 
 @section('content')
@@ -24,9 +22,11 @@ use Illuminate\Support\Facades\Storage;
                 </div>
                 <div class="card-body">
                     <div class="text-center mb-4">
-                        <div class="profile-picture-container mx-auto" data-bs-toggle="modal" data-bs-target="#profileModal" style="cursor:pointer;" onclick="showImageModal('{{ Auth::user()->profile_picture && Storage::disk('public')->exists(Auth::user()->profile_picture) ? asset('storage/' . Auth::user()->profile_picture) : asset('images/default-avatar.png') }}')">
+                        <div class="profile-picture-container mx-auto" style="cursor:pointer;" onclick="showImageModal('{{ Auth::user()->profile_picture_url }}')">
                             @if(Auth::user()->profile_picture && Storage::disk('public')->exists(Auth::user()->profile_picture))
                                 <img src="{{ asset('storage/' . Auth::user()->profile_picture) }}" alt="Profile Picture" class="profile-picture">
+                            @elseif(Auth::user()->avatar)
+                                <img src="{{ Auth::user()->avatar }}" alt="Profile Picture" class="profile-picture">
                             @else
                                 <div class="profile-picture-placeholder">
                                     <i class="fas fa-user"></i>
@@ -174,26 +174,6 @@ use Illuminate\Support\Facades\Storage;
                         </div>
                     </form>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Profile Picture Modal -->
-<div class="modal fade" id="profileModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered modal-fullscreen-md-down modal-xl">
-        <div class="modal-content bg-transparent border-0">
-            <div class="modal-body p-0 text-end">
-                <button type="button" class="btn-close-custom" data-bs-dismiss="modal">
-                    <i class="fas fa-times"></i>
-                </button>
-                @if($user->profile_picture && Storage::disk('public')->exists($user->profile_picture))
-                    <img src="{{ asset('storage/' . $user->profile_picture) }}" alt="Profile Picture" class="modal-profile-image">
-                @else
-                    <div class="modal-profile-placeholder">
-                        <i class="fas fa-user"></i>
-                    </div>
-                @endif
             </div>
         </div>
     </div>

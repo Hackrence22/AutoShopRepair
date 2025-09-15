@@ -51,9 +51,18 @@
                             </div>
                             <div class="card-body pb-2">
                                 <div class="mb-3">
-                                    <span class="fw-bold text-muted">Owner:</span> {{ $shop->owner_name }}<br>
-                                    <span class="fw-bold text-muted">Phone:</span> <a href="tel:{{ $shop->phone }}" class="text-decoration-none">{{ $shop->phone }}</a><br>
-                                    <span class="fw-bold text-muted">Email:</span> <a href="mailto:{{ $shop->email }}" class="text-decoration-none">{{ $shop->email }}</a>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <img src="{{ optional($shop->admin)->profile_picture ? asset('storage/' . $shop->admin->profile_picture) : asset('images/default-profile.png') }}" class="rounded-circle me-2" style="width:28px;height:28px;object-fit:cover;">
+                                        <div>
+                                            <span class="fw-bold text-muted">Owner:</span> {{ $shop->owner_name }}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <span class="fw-bold text-muted">Phone:</span> <a href="tel:{{ $shop->phone }}" class="text-decoration-none">{{ $shop->phone }}</a>
+                                    </div>
+                                    <div>
+                                        <span class="fw-bold text-muted">Email:</span> <a href="mailto:{{ $shop->email }}" class="text-decoration-none">{{ $shop->email }}</a>
+                                    </div>
                                 </div>
                                 <div class="mb-3">
                                     <span class="fw-bold text-muted">Address:</span> <span class="text-muted">{{ $shop->full_address }}</span>
@@ -70,6 +79,14 @@
                                 <div class="d-flex gap-2 mb-3 flex-wrap">
                                     <span class="badge bg-primary text-white"><i class="fas fa-tools me-1"></i> {{ $shop->services->count() }} Services</span>
                                     <span class="badge bg-warning text-dark"><i class="fas fa-clock me-1"></i> {{ $shop->slotSettings->count() }} Time Slots</span>
+                                    @if($shop->average_rating)
+                                        <span class="badge bg-secondary text-white d-inline-flex align-items-center" style="gap:6px;">
+                                            <i class="fas fa-star" style="color:#ffc107;"></i>
+                                            {{ number_format($shop->average_rating, 1) }}
+                                        </span>
+                                    @else
+                                        <span class="badge bg-secondary text-white">No ratings</span>
+                                    @endif
                                 </div>
                             </div>
                             <div class="card-footer bg-white border-0 d-flex justify-content-between align-items-center pt-2 pb-3">

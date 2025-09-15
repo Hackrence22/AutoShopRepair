@@ -74,6 +74,7 @@
                                     <span class="badge bg-primary text-white"><i class="fas fa-tools me-1"></i> {{ $shop->services->count() }} Services</span>
                                     <span class="badge bg-warning text-dark"><i class="fas fa-clock me-1"></i> {{ $shop->slotSettings->count() }} Slots</span>
                                     <span class="badge bg-success text-white"><i class="fas fa-calendar-check me-1"></i> {{ $shop->appointments->count() }} Appointments</span>
+                                    <span class="badge bg-secondary text-white"><i class="fas fa-star me-1" style="color:#ffc107;"></i> {{ $shop->average_rating ? number_format($shop->average_rating, 1) : 'No ratings' }} ({{ $shop->ratings_count ?? 0 }})</span>
                                 </div>
                             </div>
                             <div class="card-footer bg-white border-0 d-flex justify-content-between align-items-center pt-2 pb-3">

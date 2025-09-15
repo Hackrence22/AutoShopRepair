@@ -19,6 +19,9 @@ use App\Http\Controllers\Admin\SlotSettingController;
 use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\AnalyticsApiController;
 use App\Http\Controllers\ServiceDetailsController;
+use App\Http\Controllers\Auth\SocialAuthController;
+use App\Http\Controllers\ShopRatingController;
+use App\Http\Controllers\Admin\ShopRatingAdminController;
 
 // Welcome page route
 Route::get('/', [HomeController::class, 'index'])->name('welcome');
@@ -34,6 +37,10 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [LoginController::class, 'login']);
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'register']);
+    
+    // Social Authentication Routes
+    Route::get('/auth/google', [SocialAuthController::class, 'redirectToGoogle'])->name('auth.google');
+    Route::get('/auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 });
 
 // Logout Route (must be outside guest middleware)
@@ -76,6 +83,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/recommendations/seasonal', [\App\Http\Controllers\RecommendationController::class, 'getSeasonalRecommendations'])->name('recommendations.seasonal');
     Route::get('/recommendations/cross-selling', [\App\Http\Controllers\RecommendationController::class, 'getCrossSellingRecommendations'])->name('recommendations.cross-selling');
     Route::get('/recommendations-page', [\App\Http\Controllers\RecommendationController::class, 'index'])->name('recommendations.page');
+
+    // Shop Ratings
+    Route::post('/shops/{shop}/ratings', [ShopRatingController::class, 'store'])->name('shops.ratings.store');
     
     // Pricing Optimization Routes
     Route::get('/pricing/optimal', [\App\Http\Controllers\PricingController::class, 'getOptimalPricing'])->name('pricing.optimal');
@@ -163,6 +173,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth:admin'], 'as' => 'admi
     Route::get('payments/history', [\App\Http\Controllers\Admin\PaymentManagementController::class, 'history'])->name('payments.history');
     Route::get('payments/history/csv', [\App\Http\Controllers\Admin\PaymentManagementController::class, 'historyCsv'])->name('payments.history.csv');
     Route::get('payments/history/pdf', [\App\Http\Controllers\Admin\PaymentManagementController::class, 'historyPdf'])->name('payments.history.pdf');
+
+    // Ratings
+    Route::get('ratings', [ShopRatingAdminController::class, 'index'])->name('ratings.index');
     
     // Admin Notification Routes (separate from user notifications)
     Route::get('notifications', [\App\Http\Controllers\NotificationController::class, 'adminIndex'])->name('notifications.index');

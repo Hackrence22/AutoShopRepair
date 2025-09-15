@@ -76,6 +76,20 @@
                         </button>
                     </div>
                 </form>
+                
+                <!-- Social Login Section -->
+                <div class="mt-4">
+                    <div class="text-center mb-3">
+                        <span class="text-muted">Or login with</span>
+                    </div>
+                    <div class="row g-2">
+                        <div class="col-12">
+                            <a href="{{ route('auth.google') }}" class="btn btn-outline-danger w-100">
+                                <i class="fab fa-google me-2"></i>Google
+                            </a>
+                        </div>
+                    </div>
+                </div>
                 @endif
 
                 <div class="text-center mt-4">

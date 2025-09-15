@@ -64,6 +64,21 @@ class Shop extends Model
         return $this->hasMany(Technician::class);
     }
 
+    public function ratings()
+    {
+        return $this->hasMany(ShopRating::class);
+    }
+
+    public function getAverageRatingAttribute()
+    {
+        if (!array_key_exists('ratings_avg_rating', $this->attributes)) {
+            return round((float) $this->ratings()->avg('rating'), 2) ?: null;
+        }
+        return $this->attributes['ratings_avg_rating'] !== null
+            ? round((float) $this->attributes['ratings_avg_rating'], 2)
+            : null;
+    }
+
     // Scopes
     public function scopeActive($query)
     {

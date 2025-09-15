@@ -128,6 +128,15 @@
                                     <small class="text-muted">Slot Settings</small>
                                 </div>
                             </div>
+                            <div class="row text-center mt-3">
+                                <div class="col-12">
+                                    <div class="fw-bold h5">
+                                        <i class="fas fa-star me-1" style="color:#ffc107;"></i>
+                                        {{ $shop->average_rating ? number_format($shop->average_rating, 1) : 'No ratings' }}
+                                        <small class="text-muted">({{ $shop->ratings_count ?? $shop->ratings->count() }} reviews)</small>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -182,6 +191,11 @@
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link" id="slots-tab" data-bs-toggle="tab" data-bs-target="#slots" type="button" role="tab">
                                         <i class="fas fa-clock me-1"></i>Slot Settings ({{ $shop->slotSettings->count() }})
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="ratings-tab" data-bs-toggle="tab" data-bs-target="#ratings" type="button" role="tab">
+                                        <i class="fas fa-star me-1"></i>Ratings ({{ $shop->ratings_count ?? $shop->ratings->count() }})
                                     </button>
                                 </li>
                             </ul>
@@ -344,6 +358,48 @@
                                             <a href="{{ route('admin.slot-settings.create', ['shop_id' => $shop->id]) }}" class="btn btn-primary">
                                                 <i class="fas fa-plus"></i> Add Slot Setting
                                             </a>
+                                        </div>
+                                    @endif
+                                </div>
+
+                                <!-- Ratings Tab -->
+                                <div class="tab-pane fade" id="ratings" role="tabpanel">
+                                    @if($shop->ratings->count() > 0)
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>User</th>
+                                                        <th>Rating</th>
+                                                        <th>Comment</th>
+                                                        <th>Date</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach($shop->ratings as $rating)
+                                                    <tr>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <img src="{{ $rating->user->profile_picture_url }}" onerror="this.onerror=null;this.src='{{ $rating->user->avatar ?? asset('images/default-profile.png') }}';" class="rounded-circle me-2" style="width:32px;height:32px;object-fit:cover;">
+                                                                <span>{{ $rating->user->name }}</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            @for($i=1; $i<=5; $i++)
+                                                                <i class="fas fa-star" style="color: {{ $i <= $rating->rating ? '#ffc107' : '#e4e5e9' }};"></i>
+                                                            @endfor
+                                                        </td>
+                                                        <td>{{ $rating->comment }}</td>
+                                                        <td>{{ $rating->created_at->format('M d, Y h:i A') }}</td>
+                                                    </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    @else
+                                        <div class="text-center py-4">
+                                            <i class="fas fa-star fa-2x text-muted mb-2"></i>
+                                            <p class="text-muted">No ratings yet for this shop.</p>
                                         </div>
                                     @endif
                                 </div>
