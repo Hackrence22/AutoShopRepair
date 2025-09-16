@@ -22,6 +22,8 @@ use App\Http\Controllers\ServiceDetailsController;
 use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\ShopRatingController;
 use App\Http\Controllers\Admin\ShopRatingAdminController;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\TestMail;
 
 // Welcome page route
 Route::get('/', [HomeController::class, 'index'])->name('welcome');
@@ -41,6 +43,62 @@ Route::middleware('guest')->group(function () {
     // Social Authentication Routes
     Route::get('/auth/google', [SocialAuthController::class, 'redirectToGoogle'])->name('auth.google');
     Route::get('/auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
+});
+// Resend pending registration verification
+Route::post('/registration/resend', function(\Illuminate\Http\Request $request) {
+    $request->validate(['email' => 'required|email']);
+    $pending = \App\Models\PendingRegistration::where('email', $request->input('email'))->first();
+    if (!$pending) {
+        return back()->with('error', 'No pending registration found for that email.');
+    }
+    if ($pending->expires_at && $pending->expires_at->isPast()) {
+        $pending->update(['token' => \Illuminate\Support\Str::random(64), 'expires_at' => now()->addHours(24)]);
+    }
+    $verifyUrl = url('/verify-registration/'.$pending->token);
+    \Mail::to($pending->email)->send(new \App\Mail\VerifyRegistrationMail($pending->name, $verifyUrl));
+    if ($request->expectsJson()) {
+        return response()->json(['success' => true, 'message' => 'Verification email resent.']);
+    }
+    return view('auth.registration-pending', ['email' => $pending->email])
+        ->with('success', 'Verification email resent.');
+})->name('registration.resend');
+// Email verification routes
+Route::middleware('auth')->group(function() {
+    Route::get('/email/verify', [\App\Http\Controllers\Auth\VerificationController::class, 'show'])->name('verification.notice');
+    Route::get('/email/verify/{id}/{hash}', [\App\Http\Controllers\Auth\VerificationController::class, 'verify'])->middleware('signed')->name('verification.verify');
+    Route::post('/email/resend', [\App\Http\Controllers\Auth\VerificationController::class, 'resend'])->middleware('throttle:6,1')->name('verification.resend');
+});
+
+// Custom pending registration verification (pre-account)
+Route::get('/verify-registration/{token}', function($token) {
+    $pending = \App\Models\PendingRegistration::where('token', $token)->where(function($q){
+        $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
+    })->first();
+    if (!$pending) {
+        return redirect()->route('register')->with('error', 'Invalid or expired verification link. Please register again.');
+    }
+    // Create user now
+    $user = \App\Models\User::create([
+        'name' => $pending->name,
+        'email' => $pending->email,
+        'phone' => $pending->phone,
+        'password' => $pending->password,
+        'email_verified_at' => now(),
+    ]);
+    // Cleanup
+    $pending->delete();
+    return redirect()->route('login')->with('success', 'Email verified! You can now log in.');
+})->name('registration.verify');
+
+// Temporary test route for mail
+Route::get('/test-mail', function() {
+    try {
+        $to = request('to', config('mail.from.address'));
+        Mail::to($to)->send(new TestMail());
+        return 'Mail sent to ' . $to;
+    } catch (\Throwable $e) {
+        return response('Mail failed: ' . $e->getMessage(), 500);
+    }
 });
 
 // Logout Route (must be outside guest middleware)

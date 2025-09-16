@@ -9,6 +9,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Auth\Events\Registered;
+use App\Models\PendingRegistration;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\VerifyRegistrationMail;
 
 class RegisterController extends Controller
 {
@@ -42,9 +47,28 @@ class RegisterController extends Controller
         ]);
     }
 
-    protected function registered(Request $request, $user)
+    public function register(Request $request)
     {
-        return redirect()->route('login')
-            ->with('success', 'Welcome to Auto Repair Shop! Your account has been created successfully.');
+        $this->validator($request->all())->validate();
+
+        // Create pending record, do not create user yet
+        $token = Str::random(64);
+        $pending = PendingRegistration::updateOrCreate(
+            ['email' => $request->input('email')],
+            [
+                'name' => $request->input('name'),
+                'phone' => $request->input('phone'),
+                'password' => Hash::make($request->input('password')),
+                'token' => $token,
+                'expires_at' => now()->addHours(24),
+            ]
+        );
+
+        $verifyUrl = url('/verify-registration/'.$pending->token);
+        Mail::to($pending->email)->send(new VerifyRegistrationMail($pending->name, $verifyUrl));
+
+        return view('auth.registration-pending', [
+            'email' => $pending->email,
+        ])->with('success', 'Verification email sent.');
     }
 } 

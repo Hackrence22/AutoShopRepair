@@ -7,6 +7,8 @@ use App\Models\Appointment;
 use Illuminate\Http\Request;
 use App\Models\Notification;
 use App\Services\SmsService;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\AppointmentStatusChangedMail;
 
 class AdminAppointmentController extends Controller
 {
@@ -184,6 +186,16 @@ class AdminAppointmentController extends Controller
                 $sms->send($to, 'Hi ' . $appointment->customer_name . '! Your appointment status has been updated to: ' . ucfirst($appointment->status) . '. For ' . $appointment->appointment_date->format('M d, Y') . ' at ' . $appointment->appointment_time->format('h:i A') . '. Thank you! 📱');
             }
         } catch (\Throwable $e) {}
+        // Email: status changed
+        try {
+            Mail::to($appointment->email)->send(new AppointmentStatusChangedMail([
+                'user_name' => $appointment->customer_name,
+                'status' => $appointment->status,
+                'date' => $appointment->appointment_date->format('M d, Y'),
+                'time' => $appointment->appointment_time->format('h:i A'),
+                'note' => null,
+            ]));
+        } catch (\Throwable $e) {}
 
         return redirect()->route('admin.appointments.index')
             ->with('success', 'Appointment updated successfully!');
@@ -244,6 +256,16 @@ class AdminAppointmentController extends Controller
                 $sms->send($to, 'Hi ' . $appointment->customer_name . '! Your appointment status has been updated to: ' . ucfirst($appointment->status) . '. For ' . $appointment->appointment_date->format('M d, Y') . ' at ' . $appointment->appointment_time->format('h:i A') . '. Thank you! 📱');
             }
         } catch (\Throwable $e) {}
+        // Email: status changed
+        try {
+            Mail::to($appointment->email)->send(new AppointmentStatusChangedMail([
+                'user_name' => $appointment->customer_name,
+                'status' => $appointment->status,
+                'date' => $appointment->appointment_date->format('M d, Y'),
+                'time' => $appointment->appointment_time->format('h:i A'),
+                'note' => null,
+            ]));
+        } catch (\Throwable $e) {}
 
         return redirect()->back()
 ->with('success', 'Appointment status updated successfully!');
@@ -291,6 +313,16 @@ class AdminAppointmentController extends Controller
                 $sms->send($to, 'Hi ' . $appointment->customer_name . '! Great news! Your appointment for ' . $appointment->appointment_date->format('M d, Y') . ' at ' . $appointment->appointment_time->format('h:i A') . ' has been APPROVED! 🎉 Please arrive on time. See you soon!');
             }
         } catch (\Throwable $e) {}
+        // Email: approved
+        try {
+            Mail::to($appointment->email)->send(new AppointmentStatusChangedMail([
+                'user_name' => $appointment->customer_name,
+                'status' => 'approved',
+                'date' => $appointment->appointment_date->format('M d, Y'),
+                'time' => $appointment->appointment_time->format('h:i A'),
+                'note' => null,
+            ]));
+        } catch (\Throwable $e) {}
         return redirect()->back()->with('success', 'Appointment approved successfully!');
     }
 
@@ -335,6 +367,16 @@ class AdminAppointmentController extends Controller
             if ($to) {
                 $sms->send($to, 'Hi ' . $appointment->customer_name . ', we\'re sorry but your appointment for ' . $appointment->appointment_date->format('M d, Y') . ' at ' . $appointment->appointment_time->format('h:i A') . ' has been cancelled. Please contact us to reschedule. We apologize for any inconvenience. 📞');
             }
+        } catch (\Throwable $e) {}
+        // Email: rejected
+        try {
+            Mail::to($appointment->email)->send(new AppointmentStatusChangedMail([
+                'user_name' => $appointment->customer_name,
+                'status' => 'cancelled',
+                'date' => $appointment->appointment_date->format('M d, Y'),
+                'time' => $appointment->appointment_time->format('h:i A'),
+                'note' => 'Your appointment was rejected. Please contact us to reschedule.',
+            ]));
         } catch (\Throwable $e) {}
         return redirect()->back()
             ->with('success', 'Appointment rejected successfully!');

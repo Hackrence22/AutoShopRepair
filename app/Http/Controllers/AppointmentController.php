@@ -12,6 +12,8 @@ use App\Models\Notification;
 use App\Models\Admin;
 use App\Services\AppointmentSchedulingService;
 use App\Services\NotificationService;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\AppointmentBookedMail;
 
 class AppointmentController extends Controller
 {
@@ -251,6 +253,18 @@ class AppointmentController extends Controller
             $this->notificationService->notifyPaymentSubmission($appointment);
         }
         
+        // Email: appointment booked
+        try {
+            $appointment->loadMissing(['shop', 'service']);
+            Mail::to($appointment->email)->send(new AppointmentBookedMail([
+                'user_name' => $appointment->customer_name,
+                'date' => $appointment->appointment_date->format('M d, Y'),
+                'time' => $appointment->appointment_time->format('h:i A'),
+                'service' => optional($appointment->service)->name ?? $appointment->service_type,
+                'shop' => $appointment->shop,
+            ]));
+        } catch (\Throwable $e) {}
+
         // SMS: appointment booked confirmation
         try {
             $sms = app(SmsService::class);
