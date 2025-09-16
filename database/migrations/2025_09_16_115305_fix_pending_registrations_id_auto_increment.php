@@ -11,7 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // No-op duplicate safeguard
+        // This migration is no longer needed as the pending_registrations table
+        // already has the correct auto-incrementing id column from the original migration
     }
 
     /**
@@ -19,6 +20,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // No-op duplicate safeguard
+        // This migration is not reversible as it fixes a structural issue
     }
 };

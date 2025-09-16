@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Sep 15, 2025 at 02:05 PM
+-- Generation Time: Sep 16, 2025 at 06:11 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -44,8 +44,8 @@ CREATE TABLE `admins` (
 --
 
 INSERT INTO `admins` (`id`, `name`, `email`, `password`, `role`, `profile_picture`, `remember_token`, `created_at`, `updated_at`) VALUES
-(1, 'Admin Clarence', 'admin@gmail.com', '$2y$12$bOp51ooh/nyQdySJewaStu5ctQaxaps81zozLQ1uHWiJnp9cqrSC6', 'admin', NULL, NULL, '2025-09-15 08:53:46', '2025-09-15 08:53:46'),
-(2, 'Clarence Angelo D. Lisondra', 'bimborepair@gmail.com', '$2y$12$7Sa6sgApoQ9TPpICX1NIruQCJ58NEmnZNC4QBcmSrs2h3xOxpHz4W', 'owner', 'admin-profiles/ic8rh76hc14PpeOpXFnAtSB84AlVirmw4CHz8KXJ.jpg', NULL, '2025-09-15 08:55:12', '2025-09-15 08:55:12');
+(1, 'Admin Clarence', 'admin@gmail.com', '$2y$12$YiCsohKKhvCSzmVajmRxyORFXDMQs23OUFDhC0n6UlqHDRA.zmrse', 'admin', 'profile-pictures/a4tZHKG9XNqP4DLDoxGsqara4Df1vXTdRGpFCxvE.jpg', NULL, '2025-09-16 04:02:38', '2025-09-16 04:03:48'),
+(2, 'Clarence Angelo Lisondra', 'clarencelisondra45@gmail.com', '$2y$12$1xLbvBU6J6MVgXtL6aNlFudFFLBGIGosPv3xqia5Mb/9kmWaXmY.q', 'owner', 'admin-profiles/nyf4DbQgY1jg3AMhp6dVBBNRONvOyz7U9Acced6F.jpg', NULL, '2025-09-16 04:03:24', '2025-09-16 04:03:24');
 
 -- --------------------------------------------------------
 
@@ -93,14 +93,6 @@ CREATE TABLE `cache` (
   `value` mediumtext NOT NULL,
   `expiration` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `cache`
---
-
-INSERT INTO `cache` (`key`, `value`, `expiration`) VALUES
-('laravel_cache_admin@gmail.com|127.0.0.1', 'i:1;', 1757926374),
-('laravel_cache_admin@gmail.com|127.0.0.1:timer', 'i:1757926374;', 1757926374);
 
 -- --------------------------------------------------------
 
@@ -234,34 +226,34 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (12, '2025_05_05_150000_update_appointments_service_ids', 1),
 (13, '2025_05_05_165618_create_feedback_table', 1),
 (14, '2025_07_12_145550_create_payment_methods_table', 1),
-(15, '2025_07_12_145616_add_payment_method_id_to_appointments_table', 1),
-(16, '2025_07_12_145619_add_payment_method_id_to_appointments_table', 1),
-(17, '2025_07_12_151239_add_fields_to_payment_methods_table', 1),
-(18, '2025_07_12_151300_add_payment_proof_and_reference_number_to_appointments_table', 1),
-(19, '2025_07_12_151400_add_payment_status_to_appointments_table', 1),
-(20, '2025_07_12_151500_create_notifications_table', 1),
-(21, '2025_07_12_170000_add_reply_to_feedback_table', 1),
-(22, '2025_08_06_125202_create_shops_table', 1),
-(23, '2025_08_06_125244_add_shop_id_to_services_table', 1),
-(24, '2025_08_06_125250_add_shop_id_to_services_table', 1),
-(25, '2025_08_06_125256_add_shop_id_to_slot_settings_table', 1),
-(26, '2025_08_06_125301_add_shop_id_to_appointments_table', 1),
-(27, '2025_08_06_135359_update_services_type_column', 1),
-(28, '2025_08_06_153022_add_shop_id_to_payment_methods_table', 1),
-(29, '2025_08_22_135202_update_map_embed_url_column_in_shops_table', 1),
-(30, '2025_08_28_000001_add_role_to_admins_table', 1),
-(31, '2025_08_28_000002_add_admin_id_to_shops_table', 1),
-(32, '2025_08_30_113949_add_shop_id_to_notifications_table', 1),
-(33, '2025_08_30_121736_create_technicians_table', 1),
-(34, '2025_08_30_121806_add_technician_id_to_appointments_table', 1),
-(35, '2025_09_02_133823_add_category_to_customer_services_table', 1),
-(36, '2025_09_02_134000_check_customer_services_table_structure', 1),
-(37, '2025_09_02_134813_check_customer_services_table_structure', 1),
-(38, '2025_09_14_173927_add_reminder_fields_to_appointments_table', 1),
-(39, '2025_09_14_174235_add_phone_to_admins_table', 1),
-(40, '2025_09_14_213829_add_social_fields_to_users_table', 1),
-(41, '2025_09_15_120000_create_shop_ratings_table', 1),
-(42, '2025_09_15_121000_drop_unique_index_on_shop_ratings', 1);
+(15, '2025_07_12_145619_add_payment_method_id_to_appointments_table', 1),
+(16, '2025_07_12_151239_add_fields_to_payment_methods_table', 1),
+(17, '2025_07_12_151300_add_payment_proof_and_reference_number_to_appointments_table', 1),
+(18, '2025_07_12_151400_add_payment_status_to_appointments_table', 1),
+(19, '2025_07_12_151500_create_notifications_table', 1),
+(20, '2025_07_12_170000_add_reply_to_feedback_table', 1),
+(21, '2025_08_06_125202_create_shops_table', 1),
+(22, '2025_08_06_125244_add_shop_id_to_services_table', 1),
+(23, '2025_08_06_125256_add_shop_id_to_slot_settings_table', 1),
+(24, '2025_08_06_125301_add_shop_id_to_appointments_table', 1),
+(25, '2025_08_06_135359_update_services_type_column', 1),
+(26, '2025_08_06_153022_add_shop_id_to_payment_methods_table', 1),
+(27, '2025_08_22_135202_update_map_embed_url_column_in_shops_table', 1),
+(28, '2025_08_28_000001_add_role_to_admins_table', 1),
+(29, '2025_08_28_000002_add_admin_id_to_shops_table', 1),
+(30, '2025_08_30_113949_add_shop_id_to_notifications_table', 1),
+(31, '2025_08_30_121736_create_technicians_table', 1),
+(32, '2025_08_30_121806_add_technician_id_to_appointments_table', 1),
+(33, '2025_09_02_133823_add_category_to_customer_services_table', 1),
+(34, '2025_09_02_134000_check_customer_services_table_structure', 1),
+(35, '2025_09_02_134813_check_customer_services_table_structure', 1),
+(36, '2025_09_14_173927_add_reminder_fields_to_appointments_table', 1),
+(37, '2025_09_14_174235_add_phone_to_admins_table', 1),
+(38, '2025_09_14_213829_add_social_fields_to_users_table', 1),
+(39, '2025_09_15_120000_create_shop_ratings_table', 1),
+(40, '2025_09_15_121000_drop_unique_index_on_shop_ratings', 1),
+(41, '2025_09_15_130000_create_pending_registrations_table', 1),
+(42, '2025_09_16_115305_fix_pending_registrations_id_auto_increment', 1);
 
 -- --------------------------------------------------------
 
@@ -321,8 +313,26 @@ CREATE TABLE `payment_methods` (
 --
 
 INSERT INTO `payment_methods` (`id`, `shop_id`, `name`, `image`, `account_name`, `account_number`, `role_type`, `description`, `is_active`, `sort_order`, `created_at`, `updated_at`) VALUES
-(1, 1, 'Gcash Bimbo', 'IQeTP1fJ10c6kkWb6CI4e5dZpT2uIyB2H1JIVwRR.jpg', 'Gcash Bimbo', '09460721827', 'gcash', 'Pay via QR code here or just via send.', 1, 0, '2025-09-15 08:57:02', '2025-09-15 08:57:02'),
-(2, 1, 'Cash Bimbo', NULL, 'Cash Bimbo', '09460721827', 'cash', 'Pay via cash here.', 1, 0, '2025-09-15 08:57:15', '2025-09-15 08:57:15');
+(1, 1, 'Bimbo Auto Repair Shop Cash', NULL, 'Bimbo Cash', NULL, 'cash', 'Actual payment with cashier.', 1, 0, '2025-09-16 04:09:14', '2025-09-16 04:10:59'),
+(2, 1, 'Bimbo Auto Repair Shop GCash', NULL, 'Bimbo GCash', '09460721827', 'gcash', 'Pay via QR code or use via send and use the number presented.', 1, 1, '2025-09-16 04:10:18', '2025-09-16 04:10:18');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `pending_registrations`
+--
+
+CREATE TABLE `pending_registrations` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `phone` varchar(255) DEFAULT NULL,
+  `password` varchar(255) NOT NULL,
+  `token` varchar(255) NOT NULL,
+  `expires_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -367,7 +377,7 @@ CREATE TABLE `services` (
 --
 
 INSERT INTO `services` (`id`, `shop_id`, `name`, `description`, `price`, `duration`, `type`, `is_active`, `created_at`, `updated_at`) VALUES
-(1, 1, 'Engine Tunning', 'We accept motor and car repair, maintenance and inspection.', 1000.00, 1440, 'maintenance', 1, '2025-09-15 08:56:11', '2025-09-15 08:56:11');
+(1, 1, 'Engine Tuning', 'Do check and maintenance on the engine.', 700.00, 480, 'maintenance', 1, '2025-09-16 04:08:21', '2025-09-16 04:08:21');
 
 -- --------------------------------------------------------
 
@@ -389,8 +399,9 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('nUcvQm9g6JNDpp7dSPO7GIR9rrP2iiNVohYHCWi7', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiMW9xTUEwaExWeGxJcUpmWTB4c1JTUmNnR3RYRER5ODhXc0RUVFdTayI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly9sb2NhbGhvc3Q6ODAwMCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjE7fQ==', 1757927373),
-('yCDhQburKVtduPL2ZvXo6FFg44zwBE8JColeHOZt', 2, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiUldza2h5bUdmZzVJWDFQZk9ibEI1Y0N4M2VzenF2TVFzUEx1em9lRiI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzU6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbi9yYXRpbmdzIjt9czo1MjoibG9naW5fYWRtaW5fNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToyO30=', 1757927207);
+('2zSlaIln8StcJfvPId3rDcOHhZCi0atHlF4HWE0z', NULL, '192.168.1.10', '', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiN2JaMEI1WGJSdjE5MEpORnZoNTJPYUR0NnJ4V21zVDZBV2Z4eTVuUyI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MjQ6Imh0dHA6Ly8xOTIuMTY4LjEuMTA6ODAwMCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1757995699),
+('NVSRXyfjpnfbIW1ByOYAFrzeg2oh8Ojmy9o88OPW', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoic2F4R2hjRklDeUh4WmtFQkdXeVNFeUJvYUVQZmo1SlliMG1BSHlCMiI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzM6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbi9sb2dpbiI7fX0=', 1757995868),
+('Wpma8xGypJqXZKUD3bRTRozOXbxxVCY6Px6gyzAn', NULL, '192.168.1.10', 'Norton Antivirus', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiWnhSVWN1VmVlMlFzblo1QTFNQXZRZlFzWUVkOEJRWHduZklXdzJjeSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MjQ6Imh0dHA6Ly8xOTIuMTY4LjEuMTA6ODAwMCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1757995698);
 
 -- --------------------------------------------------------
 
@@ -413,9 +424,9 @@ CREATE TABLE `settings` (
 --
 
 INSERT INTO `settings` (`id`, `key`, `value`, `type`, `group`, `created_at`, `updated_at`) VALUES
-(1, 'weekday_hours', 'Monday - Friday: 8:00 AM - 6:00 PM', 'string', 'business_hours', '2025-09-15 08:53:45', '2025-09-15 08:53:45'),
-(2, 'weekend_hours', 'Saturday: 9:00 AM - 4:00 PM', 'string', 'business_hours', '2025-09-15 08:53:45', '2025-09-15 08:53:45'),
-(3, 'sunday_hours', 'Sunday - Closed', 'string', 'business_hours', '2025-09-15 08:53:45', '2025-09-15 08:53:45');
+(1, 'weekday_hours', 'Monday - Friday: 8:00 AM - 6:00 PM', 'string', 'business_hours', '2025-09-16 04:02:37', '2025-09-16 04:02:37'),
+(2, 'weekend_hours', 'Saturday: 9:00 AM - 4:00 PM', 'string', 'business_hours', '2025-09-16 04:02:37', '2025-09-16 04:02:37'),
+(3, 'sunday_hours', 'Sunday - Closed', 'string', 'business_hours', '2025-09-16 04:02:38', '2025-09-16 04:02:38');
 
 -- --------------------------------------------------------
 
@@ -454,7 +465,7 @@ CREATE TABLE `shops` (
 --
 
 INSERT INTO `shops` (`id`, `admin_id`, `name`, `owner_name`, `phone`, `email`, `address`, `city`, `state`, `zip_code`, `country`, `latitude`, `longitude`, `map_embed_url`, `description`, `image`, `opening_time`, `closing_time`, `working_days`, `is_active`, `sort_order`, `created_at`, `updated_at`) VALUES
-(1, 2, 'Bimbo Repair Shop', 'Clarence Angelo D. Lisondra', '09472622131', 'bimborepair@gmail.com', 'Brgy. Luna, Highway, Surigao City.', 'Surigao City', 'Surigao Del Norte', '8400', 'Philippines', NULL, NULL, NULL, 'We accept motor and car repair, maintenance and inspection.', 'shop-images/39n88x0WcIW64jXltrWbculLIPYFx24DcOkhzkps.jpg', '08:00:00', '18:00:00', '[\"1\",\"2\",\"3\",\"4\",\"5\",\"6\",\"7\"]', 1, 0, '2025-09-15 08:55:51', '2025-09-15 09:06:45');
+(1, NULL, 'Bimbo Auto Repair Shop', 'Bimbo Magallanes', '09460721827', 'bimbo@gmail.com', 'Brgy. Luna ext, Parkway, Rosalinda Store.', 'Surigao City', 'Surigao Del Norte', '8400', 'Philippines', NULL, NULL, NULL, 'Good customer service with lower labor cost.', 'shop-images/XyyUjNrXtF9X4QGTEV6NgXpLzTlBM2Io8pXOe9iP.jpg', '08:00:00', '17:00:00', '[\"1\",\"2\",\"3\",\"4\",\"5\",\"6\",\"7\"]', 1, 0, '2025-09-16 04:06:50', '2025-09-16 04:07:04');
 
 -- --------------------------------------------------------
 
@@ -471,14 +482,6 @@ CREATE TABLE `shop_ratings` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `shop_ratings`
---
-
-INSERT INTO `shop_ratings` (`id`, `shop_id`, `user_id`, `rating`, `comment`, `created_at`, `updated_at`) VALUES
-(1, 1, 1, 2, 'Good Service', '2025-09-15 08:58:06', '2025-09-15 08:58:06'),
-(2, 1, 1, 5, 'This shop is very good at customer service.', '2025-09-15 08:58:11', '2025-09-15 08:58:11');
 
 -- --------------------------------------------------------
 
@@ -502,7 +505,7 @@ CREATE TABLE `slot_settings` (
 --
 
 INSERT INTO `slot_settings` (`id`, `shop_id`, `start_time`, `end_time`, `slots_per_hour`, `is_active`, `created_at`, `updated_at`) VALUES
-(1, 1, '17:00:00', '18:00:00', 2, 1, '2025-09-15 08:57:38', '2025-09-15 08:57:38');
+(1, 1, '12:00:00', '13:00:00', 2, 1, '2025-09-16 04:07:23', '2025-09-16 04:07:23');
 
 -- --------------------------------------------------------
 
@@ -542,7 +545,6 @@ CREATE TABLE `users` (
   `name` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `google_id` varchar(255) DEFAULT NULL,
-  `facebook_id` varchar(255) DEFAULT NULL,
   `avatar` varchar(255) DEFAULT NULL,
   `email_verified_at` timestamp NULL DEFAULT NULL,
   `password` varchar(255) NOT NULL,
@@ -554,13 +556,6 @@ CREATE TABLE `users` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `users`
---
-
-INSERT INTO `users` (`id`, `name`, `email`, `google_id`, `facebook_id`, `avatar`, `email_verified_at`, `password`, `phone`, `address`, `role`, `profile_picture`, `remember_token`, `created_at`, `updated_at`) VALUES
-(1, 'CLARENCE ANGELO LISONDRA', 'clisondra@ssct.edu.ph', '105867137146171391992', NULL, 'https://lh3.googleusercontent.com/a/ACg8ocLT7lEcT-howbGKrTBWu-HK84QJ_peAHTCAyqErcYj8xlp9Zao=s96-c', NULL, '$2y$12$6F6QJhPTN87nFOyPxSYmHuFuaegonkPYApy2pMP3p4FFH5omz37XG', '09460721827', NULL, 'customer', 'profile-pictures/profile_1_1757926330.jpg', NULL, '2025-09-15 08:52:10', '2025-09-15 08:53:59');
 
 --
 -- Indexes for dumped tables
@@ -656,6 +651,14 @@ ALTER TABLE `password_reset_tokens`
 ALTER TABLE `payment_methods`
   ADD PRIMARY KEY (`id`),
   ADD KEY `payment_methods_shop_id_foreign` (`shop_id`);
+
+--
+-- Indexes for table `pending_registrations`
+--
+ALTER TABLE `pending_registrations`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `pending_registrations_email_unique` (`email`),
+  ADD UNIQUE KEY `pending_registrations_token_unique` (`token`);
 
 --
 -- Indexes for table `personal_access_tokens`
@@ -783,6 +786,12 @@ ALTER TABLE `payment_methods`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
+-- AUTO_INCREMENT for table `pending_registrations`
+--
+ALTER TABLE `pending_registrations`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `personal_access_tokens`
 --
 ALTER TABLE `personal_access_tokens`
@@ -810,7 +819,7 @@ ALTER TABLE `shops`
 -- AUTO_INCREMENT for table `shop_ratings`
 --
 ALTER TABLE `shop_ratings`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `slot_settings`
@@ -828,7 +837,7 @@ ALTER TABLE `technicians`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- Constraints for dumped tables
