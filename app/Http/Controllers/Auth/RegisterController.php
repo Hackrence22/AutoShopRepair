@@ -12,8 +12,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Auth\Events\Registered;
 use App\Models\PendingRegistration;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\VerifyRegistrationMail;
+use App\Services\EmailService;
 
 class RegisterController extends Controller
 {
@@ -65,7 +64,8 @@ class RegisterController extends Controller
         );
 
         $verifyUrl = url('/verify-registration/'.$pending->token);
-        Mail::to($pending->email)->send(new VerifyRegistrationMail($pending->name, $verifyUrl));
+        $emailService = app(EmailService::class);
+        $emailService->sendRegistrationVerification($pending->email, $pending->name, $verifyUrl);
 
         return view('auth.registration-pending', [
             'email' => $pending->email,

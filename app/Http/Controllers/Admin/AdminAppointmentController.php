@@ -7,8 +7,7 @@ use App\Models\Appointment;
 use Illuminate\Http\Request;
 use App\Models\Notification;
 use App\Services\SmsService;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\AppointmentStatusChangedMail;
+use App\Services\EmailService;
 
 class AdminAppointmentController extends Controller
 {
@@ -188,13 +187,16 @@ class AdminAppointmentController extends Controller
         } catch (\Throwable $e) {}
         // Email: status changed
         try {
-            Mail::to($appointment->email)->send(new AppointmentStatusChangedMail([
+            $emailService = app(EmailService::class);
+            $emailService->sendAppointmentStatusChanged([
+                'email' => $appointment->email,
                 'user_name' => $appointment->customer_name,
                 'status' => $appointment->status,
                 'date' => $appointment->appointment_date->format('M d, Y'),
                 'time' => $appointment->appointment_time->format('h:i A'),
                 'note' => null,
-            ]));
+                'appointment_id' => $appointment->id,
+            ]);
         } catch (\Throwable $e) {}
 
         return redirect()->route('admin.appointments.index')
@@ -258,13 +260,16 @@ class AdminAppointmentController extends Controller
         } catch (\Throwable $e) {}
         // Email: status changed
         try {
-            Mail::to($appointment->email)->send(new AppointmentStatusChangedMail([
+            $emailService = app(EmailService::class);
+            $emailService->sendAppointmentStatusChanged([
+                'email' => $appointment->email,
                 'user_name' => $appointment->customer_name,
                 'status' => $appointment->status,
                 'date' => $appointment->appointment_date->format('M d, Y'),
                 'time' => $appointment->appointment_time->format('h:i A'),
                 'note' => null,
-            ]));
+                'appointment_id' => $appointment->id,
+            ]);
         } catch (\Throwable $e) {}
 
         return redirect()->back()
@@ -315,13 +320,16 @@ class AdminAppointmentController extends Controller
         } catch (\Throwable $e) {}
         // Email: approved
         try {
-            Mail::to($appointment->email)->send(new AppointmentStatusChangedMail([
+            $emailService = app(EmailService::class);
+            $emailService->sendAppointmentStatusChanged([
+                'email' => $appointment->email,
                 'user_name' => $appointment->customer_name,
                 'status' => 'approved',
                 'date' => $appointment->appointment_date->format('M d, Y'),
                 'time' => $appointment->appointment_time->format('h:i A'),
                 'note' => null,
-            ]));
+                'appointment_id' => $appointment->id,
+            ]);
         } catch (\Throwable $e) {}
         return redirect()->back()->with('success', 'Appointment approved successfully!');
     }
@@ -370,13 +378,16 @@ class AdminAppointmentController extends Controller
         } catch (\Throwable $e) {}
         // Email: rejected
         try {
-            Mail::to($appointment->email)->send(new AppointmentStatusChangedMail([
+            $emailService = app(EmailService::class);
+            $emailService->sendAppointmentStatusChanged([
+                'email' => $appointment->email,
                 'user_name' => $appointment->customer_name,
                 'status' => 'cancelled',
                 'date' => $appointment->appointment_date->format('M d, Y'),
                 'time' => $appointment->appointment_time->format('h:i A'),
                 'note' => 'Your appointment was rejected. Please contact us to reschedule.',
-            ]));
+                'appointment_id' => $appointment->id,
+            ]);
         } catch (\Throwable $e) {}
         return redirect()->back()
             ->with('success', 'Appointment rejected successfully!');

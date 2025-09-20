@@ -238,7 +238,7 @@
                     }, 1000);
                 </script>
                 @else
-                <form method="POST" action="{{ route('admin.login') }}" class="needs-validation" novalidate>
+                <form method="POST" action="{{ route('admin.login') }}" class="needs-validation" novalidate id="adminLoginForm">
                     @csrf
             @if($errors->any())
                 <div class="alert alert-danger">
@@ -289,14 +289,83 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('adminLoginForm');
         const togglePassword = document.getElementById('togglePassword');
         const password = document.getElementById('password');
+
+        // Password visibility toggle
         if (togglePassword && password) {
             togglePassword.addEventListener('click', function() {
                 const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
                 password.setAttribute('type', type);
                 togglePassword.querySelector('i').classList.toggle('fa-eye');
                 togglePassword.querySelector('i').classList.toggle('fa-eye-slash');
+            });
+        }
+
+        // Enhanced error handling - prevent input hiding
+        if (form) {
+            // Clear error states when user starts typing
+            form.addEventListener('input', function(e) {
+                const input = e.target;
+                if (input && input.classList.contains('is-invalid')) {
+                    input.classList.remove('is-invalid');
+                    const errorDiv = input.parentNode.querySelector('.custom-error');
+                    if (errorDiv) {
+                        errorDiv.remove();
+                    }
+                }
+            });
+
+            // Clear error states when user focuses on input
+            form.addEventListener('focusin', function(e) {
+                const input = e.target;
+                if (input && input.classList.contains('is-invalid')) {
+                    input.classList.remove('is-invalid');
+                    const errorDiv = input.parentNode.querySelector('.custom-error');
+                    if (errorDiv) {
+                        errorDiv.remove();
+                    }
+                }
+            });
+
+            // Form submission validation
+            form.addEventListener('submit', function(e) {
+                let isValid = true;
+                const requiredFields = form.querySelectorAll('[required]');
+                
+                // Clear previous error states
+                requiredFields.forEach(field => {
+                    field.classList.remove('is-invalid');
+                    const errorDiv = field.parentNode.querySelector('.custom-error');
+                    if (errorDiv) {
+                        errorDiv.remove();
+                    }
+                });
+
+                // Validate required fields
+                requiredFields.forEach(field => {
+                    const value = field.value ? field.value.trim() : '';
+                    if (!value) {
+                        field.classList.add('is-invalid');
+                        isValid = false;
+                        
+                        const errorDiv = document.createElement('div');
+                        errorDiv.className = 'custom-error invalid-feedback d-block';
+                        errorDiv.textContent = 'This field is required.';
+                        field.parentNode.appendChild(errorDiv);
+                    }
+                });
+
+                if (!isValid) {
+                    e.preventDefault();
+                    
+                    const firstError = form.querySelector('.is-invalid');
+                    if (firstError) {
+                        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        firstError.focus();
+                    }
+                }
             });
         }
     });

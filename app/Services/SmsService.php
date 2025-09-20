@@ -35,12 +35,13 @@ class SmsService
             
             $response = $this->sendSemaphoreSms($localNumber, $message, $senderName, $apiKey);
             
-            if ($response && isset($response['message_id'])) {
+            // Semaphore returns an array of messages, check if first message has message_id
+            if ($response && is_array($response) && isset($response[0]['message_id'])) {
                 \Log::info('SMS sent successfully via Semaphore', [
                     'to' => $toPhoneE164,
                     'local_number' => $localNumber,
-                    'message_id' => $response['message_id'],
-                    'status' => $response['status'] ?? 'unknown'
+                    'message_id' => $response[0]['message_id'],
+                    'status' => $response[0]['status'] ?? 'unknown'
                 ]);
                 return true;
             } else {

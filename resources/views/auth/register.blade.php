@@ -28,7 +28,7 @@
                     }, 1000);
                 </script>
                 @else
-                <form method="POST" action="{{ route('register') }}">
+                <form method="POST" action="{{ route('register') }}" id="registerForm">
                     @csrf
                     @include('partials.alerts')
                     
@@ -128,7 +128,7 @@
                     </div>
                     <div class="row g-2">
                         <div class="col-12">
-                            <a href="{{ route('auth.google') }}" class="btn btn-outline-danger w-100">
+                            <a href="{{ route('auth.google.register') }}" class="btn btn-outline-danger w-100">
                                 <i class="fab fa-google me-2"></i>Google
                             </a>
                         </div>
@@ -206,22 +206,108 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('registerForm');
     const togglePassword = document.getElementById('togglePassword');
     const togglePasswordConfirmation = document.getElementById('togglePasswordConfirmation');
     const password = document.getElementById('password');
     const passwordConfirmation = document.getElementById('password_confirmation');
 
+    // Password visibility toggle
     function togglePasswordVisibility(button, input) {
-        button.addEventListener('click', function() {
-            const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
-            input.setAttribute('type', type);
-            button.querySelector('i').classList.toggle('fa-eye');
-            button.querySelector('i').classList.toggle('fa-eye-slash');
-        });
+        if (button && input) {
+            button.addEventListener('click', function() {
+                const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                input.setAttribute('type', type);
+                button.querySelector('i').classList.toggle('fa-eye');
+                button.querySelector('i').classList.toggle('fa-eye-slash');
+            });
+        }
     }
 
     togglePasswordVisibility(togglePassword, password);
     togglePasswordVisibility(togglePasswordConfirmation, passwordConfirmation);
+
+    // Enhanced error handling - prevent input hiding
+    if (form) {
+        // Clear error states when user starts typing
+        form.addEventListener('input', function(e) {
+            const input = e.target;
+            if (input && input.classList.contains('is-invalid')) {
+                input.classList.remove('is-invalid');
+                // Remove any custom error messages
+                const errorDiv = input.parentNode.querySelector('.custom-error');
+                if (errorDiv) {
+                    errorDiv.remove();
+                }
+            }
+        });
+
+        // Clear error states when user focuses on input
+        form.addEventListener('focusin', function(e) {
+            const input = e.target;
+            if (input && input.classList.contains('is-invalid')) {
+                input.classList.remove('is-invalid');
+                const errorDiv = input.parentNode.querySelector('.custom-error');
+                if (errorDiv) {
+                    errorDiv.remove();
+                }
+            }
+        });
+
+        // Form submission validation
+        form.addEventListener('submit', function(e) {
+            let isValid = true;
+            const requiredFields = form.querySelectorAll('[required]');
+            
+            // Clear previous error states
+            requiredFields.forEach(field => {
+                field.classList.remove('is-invalid');
+                const errorDiv = field.parentNode.querySelector('.custom-error');
+                if (errorDiv) {
+                    errorDiv.remove();
+                }
+            });
+
+            // Validate required fields
+            requiredFields.forEach(field => {
+                const value = field.value ? field.value.trim() : '';
+                if (!value) {
+                    field.classList.add('is-invalid');
+                    isValid = false;
+                    
+                    // Add custom error message
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'custom-error invalid-feedback d-block';
+                    errorDiv.textContent = 'This field is required.';
+                    field.parentNode.appendChild(errorDiv);
+                }
+            });
+
+            // Validate password confirmation
+            if (password && passwordConfirmation) {
+                if (password.value !== passwordConfirmation.value) {
+                    passwordConfirmation.classList.add('is-invalid');
+                    isValid = false;
+                    
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'custom-error invalid-feedback d-block';
+                    errorDiv.textContent = 'Passwords do not match.';
+                    passwordConfirmation.parentNode.appendChild(errorDiv);
+                }
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+                
+                // Scroll to first error
+                const firstError = form.querySelector('.is-invalid');
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstError.focus();
+                }
+            }
+        });
+    }
 });
 </script>
 @endsection 

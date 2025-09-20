@@ -20,7 +20,18 @@
                         <div>
                             <p class="lead mb-2">We've sent a verification link to:</p>
                             <p class="fw-bold mb-3">{{ $email }}</p>
-                            <p class="mb-3 text-muted">Please check your inbox (and spam folder) and click the verification link to complete your registration.</p>
+                            
+                            @if($email !== 'clarencelisondra45@gmail.com')
+                                <div class="alert alert-info mb-3">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>Note:</strong> Due to email service limitations, the verification link has been sent to our admin email. 
+                                    We will verify your account manually within a few minutes. You can also try logging in directly - 
+                                    your account may already be activated!
+                                </div>
+                            @else
+                                <p class="mb-3 text-muted">Please check your inbox (and spam folder) and click the verification link to complete your registration.</p>
+                            @endif
+                            
                             <p class="mb-4 small text-muted">The link will expire in 24 hours. If it expires, you can register again or resend the email below.</p>
                         </div>
                     </div>

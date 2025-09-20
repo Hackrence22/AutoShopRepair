@@ -22,8 +22,6 @@ use App\Http\Controllers\ServiceDetailsController;
 use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\ShopRatingController;
 use App\Http\Controllers\Admin\ShopRatingAdminController;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\TestMail;
 
 // Welcome page route
 Route::get('/', [HomeController::class, 'index'])->name('welcome');
@@ -41,7 +39,8 @@ Route::middleware('guest')->group(function () {
     Route::post('/register', [RegisterController::class, 'register']);
     
     // Social Authentication Routes
-    Route::get('/auth/google', [SocialAuthController::class, 'redirectToGoogle'])->name('auth.google');
+    Route::get('/auth/google/login', [SocialAuthController::class, 'redirectToGoogleLogin'])->name('auth.google.login');
+    Route::get('/auth/google/register', [SocialAuthController::class, 'redirectToGoogleRegister'])->name('auth.google.register');
     Route::get('/auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 });
 // Resend pending registration verification
@@ -90,16 +89,6 @@ Route::get('/verify-registration/{token}', function($token) {
     return redirect()->route('login')->with('success', 'Email verified! You can now log in.');
 })->name('registration.verify');
 
-// Temporary test route for mail
-Route::get('/test-mail', function() {
-    try {
-        $to = request('to', config('mail.from.address'));
-        Mail::to($to)->send(new TestMail());
-        return 'Mail sent to ' . $to;
-    } catch (\Throwable $e) {
-        return response('Mail failed: ' . $e->getMessage(), 500);
-    }
-});
 
 // Logout Route (must be outside guest middleware)
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');

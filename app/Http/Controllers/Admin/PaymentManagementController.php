@@ -8,8 +8,7 @@ use App\Models\Appointment;
 use App\Models\Notification;
 use App\Services\NotificationService;
 use App\Services\SmsService;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\PaymentStatusMail;
+use App\Services\EmailService;
 use PDF;
 
 class PaymentManagementController extends Controller
@@ -71,14 +70,16 @@ class PaymentManagementController extends Controller
         $this->notificationService->sendPaymentConfirmationNotification($appointment, $pdfPath);
         // Email: payment approved
         try {
-            Mail::to($appointment->email)->send(new PaymentStatusMail([
+            $emailService = app(EmailService::class);
+            $emailService->sendPaymentStatus([
+                'email' => $appointment->email,
                 'user_name' => $appointment->customer_name,
                 'appointment_id' => $appointment->id,
                 'amount' => optional($appointment->service)->price ?? 0,
                 'reference' => $appointment->reference_number,
                 'status' => 'approved',
                 'note' => null,
-            ]));
+            ]);
         } catch (\Throwable $e) {}
         // SMS: payment confirmed
         try {
@@ -104,14 +105,16 @@ class PaymentManagementController extends Controller
         $this->notificationService->sendPaymentRejectionNotification($appointment);
         // Email: payment rejected
         try {
-            Mail::to($appointment->email)->send(new PaymentStatusMail([
+            $emailService = app(EmailService::class);
+            $emailService->sendPaymentStatus([
+                'email' => $appointment->email,
                 'user_name' => $appointment->customer_name,
                 'appointment_id' => $appointment->id,
                 'amount' => optional($appointment->service)->price ?? 0,
                 'reference' => $appointment->reference_number,
                 'status' => 'rejected',
                 'note' => 'Payment was rejected. Please re-upload correct proof or contact support.',
-            ]));
+            ]);
         } catch (\Throwable $e) {}
         // SMS: payment rejected
         try {

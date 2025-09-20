@@ -14,14 +14,19 @@
 @endif
 
 @if($errors->any())
-    <div class="alert alert-danger alert-dismissible fade show auto-dismiss mb-4" role="alert">
-        <i class="fas fa-exclamation-circle me-2"></i>
-        <ul class="mb-0">
-            @foreach($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <div class="alert alert-danger alert-dismissible fade show auto-dismiss mb-4" role="alert" id="validationErrors">
+        <div class="d-flex align-items-start">
+            <i class="fas fa-exclamation-triangle me-2 mt-1"></i>
+            <div class="flex-grow-1">
+                <h6 class="alert-title mb-2">Please correct the following errors:</h6>
+                <ul class="mb-0">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     </div>
 @endif
 
@@ -73,6 +78,56 @@
 
 .alert.fade {
     transition: opacity 0.3s linear;
+}
+
+.alert-title {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+/* Enhanced error styling for form inputs */
+.is-invalid {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+}
+
+.invalid-feedback {
+    display: block !important;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: #dc3545;
+    font-weight: 500;
+}
+
+.custom-error {
+    display: block !important;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: #dc3545;
+    font-weight: 500;
+}
+
+/* Ensure input groups don't hide errors */
+.input-group .is-invalid {
+    z-index: 3;
+}
+
+.input-group .invalid-feedback {
+    position: relative;
+    z-index: 4;
+}
+
+/* Prevent form elements from being hidden */
+.form-control:not(:placeholder-shown) {
+    background-color: #fff;
+}
+
+.form-control:focus {
+    background-color: #fff;
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 
 @keyframes fadeIn {

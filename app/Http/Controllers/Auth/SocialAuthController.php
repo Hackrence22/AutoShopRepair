@@ -13,10 +13,26 @@ use Illuminate\Support\Str;
 class SocialAuthController extends Controller
 {
     /**
-     * Redirect to Google OAuth
+     * Redirect to Google OAuth for Login
      */
-    public function redirectToGoogle()
+    public function redirectToGoogleLogin()
     {
+        // Store the intended action in session
+        session(['google_auth_action' => 'login']);
+        
+        return Socialite::driver('google')
+            ->scopes(['profile', 'email', 'phone', 'address'])
+            ->redirect();
+    }
+
+    /**
+     * Redirect to Google OAuth for Registration
+     */
+    public function redirectToGoogleRegister()
+    {
+        // Store the intended action in session
+        session(['google_auth_action' => 'register']);
+        
         return Socialite::driver('google')
             ->scopes(['profile', 'email', 'phone', 'address'])
             ->redirect();
@@ -25,15 +41,22 @@ class SocialAuthController extends Controller
     /**
      * Handle Google OAuth callback
      */
-    public function handleGoogleCallback()
+    public function handleGoogleCallback(Request $request)
     {
         try {
             $googleUser = Socialite::driver('google')->user();
+            $action = session('google_auth_action', 'login'); // Get action from session, default to login
             
             // Check if user already exists
             $user = User::where('email', $googleUser->getEmail())->first();
             
             if ($user) {
+                // User exists - handle login flow
+                if ($action === 'register') {
+                    // User tried to register but account already exists
+                    return redirect()->route('login')->with('error', 'An account with this email already exists. Please login instead.');
+                }
+                
                 // Update existing user with Google info if needed
                 $updateData = [];
                 if (!$user->google_id) {
@@ -49,7 +72,27 @@ class SocialAuthController extends Controller
                 if (empty($updateData) === false) {
                     $user->update($updateData);
                 }
+                
+                // Log the user in
+                Auth::login($user);
+                
+                // Clear the session action
+                session()->forget('google_auth_action');
+                
+                // Check if user needs to complete profile
+                if ($this->needsProfileCompletion($user)) {
+                    return redirect()->route('profile.edit')->with('info', 'Please complete your profile information to continue.');
+                }
+                
+                return redirect()->intended('/')->with('success', 'Successfully logged in with Google!');
+                
             } else {
+                // User doesn't exist - handle registration flow
+                if ($action === 'login') {
+                    // User tried to login but account doesn't exist
+                    return redirect()->route('register')->with('error', 'No account found with this email. Please register first.');
+                }
+                
                 // Create new user with enhanced profile data
                 $userData = [
                     'name' => $googleUser->getName(),
@@ -89,20 +132,30 @@ class SocialAuthController extends Controller
                 if ($profilePicturePath) {
                     $user->update(['profile_picture' => $profilePicturePath]);
                 }
+                
+                // Log the user in
+                Auth::login($user);
+                
+                // Clear the session action
+                session()->forget('google_auth_action');
+                
+                // Check if user needs to complete profile
+                if ($this->needsProfileCompletion($user)) {
+                    return redirect()->route('profile.edit')->with('info', 'Please complete your profile information to continue.');
+                }
+                
+                return redirect()->intended('/')->with('success', 'Successfully registered and logged in with Google!');
             }
-            
-            // Log the user in
-            Auth::login($user);
-            
-            // Check if user needs to complete profile
-            if ($this->needsProfileCompletion($user)) {
-                return redirect()->route('profile.edit')->with('info', 'Please complete your profile information to continue.');
-            }
-            
-            return redirect()->intended('/');
             
         } catch (\Exception $e) {
-            return redirect()->route('login')->with('error', 'Google login failed. Please try again.');
+            \Log::error('Google OAuth Error: ' . $e->getMessage(), [
+                'exception' => $e,
+                'request_data' => $request->all()
+            ]);
+            
+            // Determine which page to redirect to based on action
+            $redirectRoute = session('google_auth_action') === 'register' ? 'register' : 'login';
+            return redirect()->route($redirectRoute)->with('error', 'Google authentication failed. Please try again.');
         }
     }
 
